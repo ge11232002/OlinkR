@@ -55,9 +55,11 @@ readNPX <- function(npxFn, metaFn){
   lodMat <- npx %>% select(SampleID, OlinkID, LOD) %>%
     acast(OlinkID~SampleID, value.var = "LOD")
   colData <- npx %>% select(PlateID, colnames(meta)) %>% unique()
-  colData <- data.frame(row.names=colData$SampleID, select(colData, -SampleID))
+  colData <- data.frame(row.names=colData$SampleID, select(colData, -SampleID),
+                        check.names = FALSE)
   rowData <- npx %>% select(OlinkID, UniProt, Assay, Panel) %>% unique()
-  rowData <- data.frame(row.names=rowData$OlinkID, select(rowData, -OlinkID))
+  rowData <- data.frame(row.names=rowData$OlinkID, select(rowData, -OlinkID),
+                        check.names = FALSE)
 
   se <- SummarizedExperiment(assays=list(npx=npxMat, npxQCFlag=npxMat>lodMat),
                              colData=colData[colnames(npxMat), ],
