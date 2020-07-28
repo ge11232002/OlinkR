@@ -20,6 +20,7 @@
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
 #' se <- readNPX(npxFn, metaFn)$SummarizedExperiment
 #' ans <- olink_pca(se, colby="condition [Factor]", shape="Donor [Factor]", metavars="Weight [Numeric]")
+
 olink_pca <- function(se, colby=NULL, shape=NULL, metavars=NULL,
                       removeVar=0.1){
   x <- assay(se, "npx")

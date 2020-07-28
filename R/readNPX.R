@@ -23,6 +23,7 @@
 #'                      package="OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
 #' readNPX(npxFn, metaFn)
+
 readNPX <- function(npxFn, metaFn){
   npx <- lapply(npxFn, read_NPX)
   npx <- bind_rows(npx)

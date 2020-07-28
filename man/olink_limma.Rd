@@ -7,7 +7,7 @@
 olink_limma(se, factorCol, contrasts, blocking = NULL)
 }
 \arguments{
-\item{se}{An \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.}
+\item{se}{A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.}
 
 \item{factorCol}{\code{character}(1): The metadata column in \code{se} that defines the grouping.}
 
@@ -27,9 +27,9 @@ npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
                      package="OlinkR")
 metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
 se <- readNPX(npxFn, metaFn)$SummarizedExperiment
-ans <- olink_limma(se, factorCol="condition [Factor]",
-                   contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
-                   blocking="Donor [Factor]")
+tb <- olink_limma(se, factorCol="condition [Factor]",
+                  contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
+                  blocking="Donor [Factor]")
 }
 \author{
 Ge Tan

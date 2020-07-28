@@ -2,7 +2,7 @@
 #'
 #' Given a \code{SummarizedExperiment} object, perform two groups comparison with \code{limma} package.
 #'
-#' @param se An \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
+#' @param se A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
 #' @param factorCol \code{character}(1): The metadata column in \code{se} that defines the grouping.
 #' @param contrasts \code{character}(1): A character string which can be parsed to expressions, specifying contrasts.
 #' @param blocking \code{character}(1): The metadata column in \code{se} which serves as a blocking factor.
@@ -17,9 +17,10 @@
 #'                      package="OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
 #' se <- readNPX(npxFn, metaFn)$SummarizedExperiment
-#' ans <- olink_limma(se, factorCol="condition [Factor]",
-#'                    contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
-#'                    blocking="Donor [Factor]")
+#' tb <- olink_limma(se, factorCol="condition [Factor]",
+#'                   contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
+#'                   blocking="Donor [Factor]")
+
 olink_limma <- function(se, factorCol, contrasts, blocking=NULL){
   if(!factorCol %in% colnames(colData(se))){
     stop(factorCol, " column doesn't exist.")
