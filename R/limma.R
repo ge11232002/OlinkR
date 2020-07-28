@@ -8,7 +8,6 @@
 #' @param blocking \code{character}(1): The metadata column in \code{se} which serves as a blocking factor.
 #' @importMethodsFrom SummarizedExperiment assay rowData colData
 #' @importFrom limma makeContrasts lmFit contrasts.fit topTable eBayes
-#' @importFrom stringr str_split
 #' @export
 #' @return A \code{tibble} object of results from limma analysis
 #' @author Ge Tan
