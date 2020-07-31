@@ -30,7 +30,7 @@ npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
                      package="OlinkR")
 metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
 se <- readNPX(npxFn, metaFn)$SummarizedExperiment
-ans <- olink_pca(se, colby="condition [Factor]", shape="Donor [Factor]", metavars="Weight [Numeric]")
+ans <- olink_pca(se, colby="condition_Factor", shape="Donor_Factor", metavars="Weight_Numeric")
 }
 \author{
 Ge Tan

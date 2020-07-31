@@ -23,6 +23,7 @@ one metadata file in execel format.
 If some samples from NPX don't exist in metadata file, it gives a warning.
 Only the samples in metadata file are kept.
 If some samples from meatadata file don't exists in NPX file, it gives an error.
+Only the metadata columns ending with \dQuote{_Factor} or \dQuote{_Numeric} will be kept.
 }
 \examples{
 npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",

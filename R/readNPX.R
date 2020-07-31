@@ -6,12 +6,12 @@
 #' If some samples from NPX don't exist in metadata file, it gives a warning.
 #' Only the samples in metadata file are kept.
 #' If some samples from meatadata file don't exists in NPX file, it gives an error.
+#' Only the metadata columns ending with \dQuote{_Factor} or \dQuote{_Numeric} will be kept.
 #' @param npxFn Path to NPX files
 #' @param metaFn Path to metadata excel file
 #' @importFrom OlinkAnalyze read_NPX
 #' @importFrom readxl read_excel
 #' @importFrom SummarizedExperiment SummarizedExperiment
-#' @importFrom stringr str_c
 #' @importFrom reshape2 acast
 #' @export
 #' @return A list with two objects: a \code{\link[tibble]{tibble}} in long format and a
@@ -34,8 +34,9 @@ readNPX <- function(npxFn, metaFn){
                         isLOD=NPX <= LOD,
                         MissingFreq=as.numeric(MissingFreq))
   meta <- read_excel(metaFn)
-  meta <- meta %>% select("SampleID", contains("[Factor]"),
-                          contains("[Numeric]"))
+  colnames(meta) <- make.names(colnames(meta))
+  meta <- meta %>% select("SampleID", contains("_Factor"),
+                          contains("_Numeric"))
 
   if(length(setdiff(npx$SampleID, meta$SampleID)) != 0L){
     warning("SampleID (",

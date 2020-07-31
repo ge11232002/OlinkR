@@ -19,9 +19,9 @@
 #'                      package="OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
 #' se <- readNPX(npxFn, metaFn)$SummarizedExperiment
-#' tb <- olink_limma(se, factorCol="condition [Factor]",
+#' tb <- olink_limma(se, factorCol="condition_Factor",
 #'                   contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
-#'                   blocking="Donor [Factor]")
+#'                   blocking="Donor_Factor")
 #' olink_volcano(tb)
 
 olink_volcano <- function(tb, p.value=0.05, log2FC=0, olinkIds=NULL){
