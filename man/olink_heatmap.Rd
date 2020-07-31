@@ -4,7 +4,7 @@
 \alias{olink_heatmap}
 \title{Heatmap of Olink results}
 \usage{
-olink_heatmap(tb, se, p.value = 0.05, filename = NA)
+olink_heatmap(tb, se, p.value = 0.05, log2FC = 0, filename = NA)
 }
 \arguments{
 \item{tb}{A \code{tibble} object from \code{olink_limma} function.}
@@ -12,6 +12,8 @@ olink_heatmap(tb, se, p.value = 0.05, filename = NA)
 \item{se}{A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.}
 
 \item{p.value}{\code{numeric}(1): The p.value cutoff for significance level.}
+
+\item{log2FC}{\code{numeric}(1): The log2FC cutoff for significance level.}
 
 \item{filename}{\code{character}(1): The filename of heatmap output.}
 }

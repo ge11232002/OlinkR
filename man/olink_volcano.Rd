@@ -4,12 +4,14 @@
 \alias{olink_volcano}
 \title{Volcano plot of Olink results}
 \usage{
-olink_volcano(tb, p.value = 0.05, olinkIds = NULL)
+olink_volcano(tb, p.value = 0.05, log2FC = 0, olinkIds = NULL)
 }
 \arguments{
 \item{tb}{A \code{tibble} object from \code{olink_limma} function.}
 
 \item{p.value}{\code{numeric}(1): The p.value cutoff for significance level.}
+
+\item{log2FC}{\code{numeric}(1): The log2FC cutoff for significance level.}
 
 \item{olinkIds}{\code{character}(n): OlinkIDs to label on the volcano plot.}
 }

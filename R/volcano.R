@@ -6,6 +6,7 @@
 #'
 #' @param tb A \code{tibble} object from \code{olink_limma} function.
 #' @param p.value \code{numeric}(1): The p.value cutoff for significance level.
+#' @param log2FC \code{numeric}(1): The log2FC cutoff for significance level.
 #' @param olinkIds \code{character}(n): OlinkIDs to label on the volcano plot.
 #' @importFrom cowplot theme_cowplot
 #' @importFrom ggrepel geom_label_repel
@@ -23,9 +24,9 @@
 #'                   blocking="Donor [Factor]")
 #' olink_volcano(tb)
 
-olink_volcano <- function(tb, p.value=0.05, olinkIds=NULL){
-  tb <- tb %>% mutate(type=case_when(P.Value <= p.value & isPresent~"Significant",
-                                     P.Value > p.value & isPresent~"Non-significant",
+olink_volcano <- function(tb, p.value=0.05, log2FC=0, olinkIds=NULL){
+  tb <- tb %>% mutate(type=case_when(P.Value <= p.value & abs(logFC) >= log2FC & isPresent~"Significant",
+                                     (P.Value > p.value | abs(logFC) < log2FC) & isPresent~"Non-significant",
                                      TRUE~"Absent"))
   if(is.null(olinkIds)){
     olinkIds <- tb %>% filter(type == "Significant") %>% pull(OlinkID)
@@ -39,6 +40,8 @@ olink_volcano <- function(tb, p.value=0.05, olinkIds=NULL){
     scale_color_manual(values=c("Significant"="red", "Non-significant"="black",
                                 "Absent"="gray")) +
     geom_hline(yintercept = -log10(p.value), linetype="dotted") +
+    geom_vline(xintercept = log2FC, linetype="dotted") +
+    geom_vline(xintercept = -log2FC, linetype="dotted") +
     xlab(expression(paste(log[2], "FC"))) +
     ylab(expression(paste(-log[10], "pvalue"))) +
     scale_x_continuous(limits=c(-1.2*max(abs(tb$logFC)), 1.2*max(abs(tb$logFC)))) +

@@ -5,6 +5,7 @@
 #' @param tb A \code{tibble} object from \code{olink_limma} function.
 #' @param se A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
 #' @param p.value \code{numeric}(1): The p.value cutoff for significance level.
+#' @param log2FC \code{numeric}(1): The log2FC cutoff for significance level.
 #' @param filename \code{character}(1): The filename of heatmap output.
 #' @importFrom pheatmap pheatmap
 #' @importFrom scater uniquifyFeatureNames
@@ -22,8 +23,8 @@
 #'                   blocking="Donor [Factor]")
 #' olink_heatmap(tb, se)
 
-olink_heatmap <- function(tb, se, p.value=0.05, filename=NA){
-  tb <- tb %>% filter(P.Value < p.value, isPresent)
+olink_heatmap <- function(tb, se, p.value=0.05, log2FC=0, filename=NA){
+  tb <- tb %>% filter(P.Value < p.value, isPresent, abs(logFC) >= log2FC)
   if(nrow(tb) == 0L){
     return(NULL)
   }
