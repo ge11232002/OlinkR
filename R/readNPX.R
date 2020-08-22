@@ -3,7 +3,7 @@
 #' Read one or more NPX files from Olink NPX manager and
 #' one metadata file in execel format.
 #'
-#' The metadata excel file shall have column \dQuote{SampleID} and other metadata column that ends with \dQuote{_Factor} or \dQuote{_Numeric}.
+#' The metadata excel file shall have column \dQuote{SampleID} and other metadata column that ends with \dQuote{_Factor} (mandatory )or \dQuote{_Numeric} (optional).
 #' If some samples from NPX don't exist in metadata file, it gives a warning.
 #' Only the samples in metadata file are kept.
 #' If some samples from metadata file don't exists in NPX file, it gives an error.
