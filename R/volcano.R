@@ -32,7 +32,7 @@ olink_volcano <- function(tb, p.value=0.05, log2FC=0, olinkIds=NULL){
     olinkIds <- tb %>% filter(type == "Significant") %>% pull(OlinkID)
   }
 
-  p <- ggplot(tb, aes(logFC, -log10(P.Value))) +
+  p <- ggplot(tb %>% arrange(type), aes(logFC, -log10(P.Value))) +
     geom_point(aes(col=type)) +
     geom_label_repel(data = filter(tb, OlinkID %in% olinkIds),
                      aes(label = Assay), box.padding = 1,
