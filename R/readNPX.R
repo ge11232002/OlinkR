@@ -59,7 +59,9 @@ readNPX <- function(npxFn, metaFn){
   colData <- npx %>% select(PlateID, colnames(meta)) %>% unique()
   colData <- data.frame(row.names=colData$SampleID, select(colData, -SampleID),
                         check.names = FALSE)
-  rowData <- npx %>% select(OlinkID, UniProt, Assay, Panel, MissingFreq) %>% unique()
+  rowData <- npx %>% select(OlinkID, UniProt, Assay, Panel, MissingFreq) %>%
+    group_by(OlinkID, UniProt, Assay, Panel) %>%
+    summarise(MissingFreq=median(MissingFreq)) %>% ungroup()
   rowData <- data.frame(row.names=rowData$OlinkID, select(rowData, -OlinkID),
                         check.names = FALSE)
 
