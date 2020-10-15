@@ -78,10 +78,18 @@ overview_heatmap <- function(se, scale=c("none", "row", "column"),
                   cluster_rows=cluster_features, cluster_cols=cluster_samples,
                   ...)
   }else{
-    p <- pheatmap(toPlot, color=colorRampPalette(c("blue", "white", "red"))(100),
-                  scale=scale, annotation_col=annotation_col,
-                  cluster_rows=cluster_features, cluster_cols=cluster_samples,
-                  ...)
+    if(scale == "row"){
+      toPlot <- toPlot[sapply(matrixStats::rowSds(toPlot), all.equal, 0) != "TRUE", , drop=FALSE]
+      p <- pheatmap(toPlot, color=colorRampPalette(c("blue", "white", "red"))(100),
+                    scale=scale, annotation_col=annotation_col,
+                    cluster_rows=cluster_features, cluster_cols=cluster_samples,
+                    ...)
+    }else if(scale == "column"){
+      p <- pheatmap(toPlot, color=colorRampPalette(c("blue", "white", "red"))(100),
+                    scale=scale, annotation_col=annotation_col,
+                    cluster_rows=cluster_features, cluster_cols=cluster_samples,
+                    ...)
+    }
   }
   return(p)
 }

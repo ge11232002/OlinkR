@@ -9,6 +9,7 @@
 #' @param metavars \code{character}(n): The metedata columns with numeric values in \code{se} to correlate with principal components.
 #' @param removeVar \code{numeric}(1): Remove this fraction of variables based on low variance. DEFAULT = 0.1. OPTIONAL.
 #' @importFrom PCAtools pca parallelPCA findElbowPoint screeplot pairsplot biplot plotloadings eigencorplot getComponents
+#' @importFrom scater uniquifyFeatureNames
 #' @importMethodsFrom SummarizedExperiment assay colData
 #' @export
 #' @return A list of \code{ggplot} and \code{tibble} objects.
@@ -24,6 +25,7 @@
 olink_pca <- function(se, colby=NULL, shape=NULL, metavars=NULL,
                       removeVar=0.1){
   x <- assay(se, "npx")
+  rownames(x) <- uniquifyFeatureNames(rownames(se), rowData(se)$Assay)
   while(class(p <- try(pca(x, metadata = colData(se), scale=TRUE,
                            removeVar = removeVar), silent=TRUE)) == "try-error"){
     removeVar <- removeVar + 0.1
@@ -53,7 +55,8 @@ olink_pca <- function(se, colby=NULL, shape=NULL, metavars=NULL,
                              legendPosition = 'right', title = 'PCA bi-plot')
 
   ## Loading plot
-  ans[["loading plot"]] <- plotloadings(p, rangeRetain = 0.01, labSize = 3,
+  ans[["loading plot"]] <- plotloadings(p, components=head(p$components, 5),
+                                        rangeRetain = 0.01, labSize = 3,
                                         title = 'Loadings plot', axisLabSize = 12,
                                         subtitle = 'PC1, PC2, PC3, PC4, PC5',
                                         caption = 'Top 1% variables',
