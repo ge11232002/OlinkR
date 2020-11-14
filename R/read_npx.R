@@ -18,6 +18,7 @@
 #' @importFrom stringr str_c
 #' @importFrom magrittr %>%
 #' @importFrom stats median model.matrix
+#' @importFrom purrr map_dfr
 #' @export
 #' @return A list with two objects: a \code{\link[tibble]{tibble}} in long format and a
 #'         \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
@@ -32,21 +33,18 @@
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' read_npx(npxFn, metaFn)
 read_npx <- function(npxFn, metaFn) {
-  npx <- lapply(npxFn, read_NPX)
-  npx <- bind_rows(npx)
+  npx <- map_dfr(npxFn, read_NPX)
   if (length(unique(npx$Panel)) > 1L) {
     stop("NPX value from different panels cannot be mixed!")
   }
   npx <- npx %>% mutate(
-    NPX = if_else(is.na(NPX), LOD, NPX),
-    isLOD = NPX <= LOD,
+    NPX = if_else(is.na(NPX), LOD, NPX), isLOD = NPX <= LOD,
     MissingFreq = as.numeric(MissingFreq)
   )
   meta <- read_excel(metaFn)
   colnames(meta) <- make.names(colnames(meta))
   meta <- meta %>% select(
-    "SampleID", contains("_Factor"),
-    contains("_Numeric")
+    "SampleID", contains("_Factor"), contains("_Numeric")
   )
 
   if (length(setdiff(npx$SampleID, meta$SampleID)) != 0L) {

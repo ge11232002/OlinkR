@@ -65,6 +65,7 @@ olink_heatmap <- function(tb, se, p.value = 0.05, log2FC = 0, ...) {
 #' @importMethodsFrom SummarizedExperiment assay
 #' @importFrom scater uniquifyFeatureNames
 #' @importFrom matrixStats rowSds
+#' @importFrom dplyr near
 #' @export
 #' @return A \code{pheatmap} object.
 #' @author Ge Tan
@@ -95,7 +96,7 @@ overview_heatmap <- function(se, scale = c("none", "row", "column"),
     )
   } else {
     if (scale == "row") {
-      toPlot <- toPlot[sapply(rowSds(toPlot), all.equal, 0) != "TRUE", , drop = FALSE]
+      toPlot <- toPlot[!near(rowSds(toPlot), 0), , drop = FALSE]
       p <- pheatmap(toPlot,
         color = colorRampPalette(c("blue", "white", "red"))(100),
         scale = scale, annotation_col = annotation_col,
