@@ -28,7 +28,7 @@ npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
                                   "20200625_Inflammation_NPX_2.xlsx"),
                      package="OlinkR")
 metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
-se <- readNPX(npxFn, metaFn)$SummarizedExperiment
+se <- read_npx(npxFn, metaFn)$SummarizedExperiment
 tb <- olink_limma(se, factorCol="condition_Factor",
                   contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
                   blocking="Donor_Factor")

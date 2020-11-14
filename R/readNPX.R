@@ -22,9 +22,9 @@
 #'                                   "20200625_Inflammation_NPX_2.xlsx"),
 #'                      package="OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
-#' readNPX(npxFn, metaFn)
+#' read_npx(npxFn, metaFn)
 
-readNPX <- function(npxFn, metaFn){
+read_npx <- function(npxFn, metaFn){
   npx <- lapply(npxFn, read_NPX)
   npx <- bind_rows(npx)
   if(length(unique(npx$Panel)) > 1L){

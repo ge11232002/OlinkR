@@ -17,7 +17,7 @@
 #'                                   "20200625_Inflammation_NPX_2.xlsx"),
 #'                      package="OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
-#' se <- readNPX(npxFn, metaFn)$SummarizedExperiment
+#' se <- read_npx(npxFn, metaFn)$SummarizedExperiment
 #' tb <- olink_limma(se, factorCol="condition_Factor",
 #'                   contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
 #'                   blocking="Donor_Factor")
@@ -54,6 +54,7 @@ olink_heatmap <- function(tb, se, p.value=0.05, log2FC=0, ...){
 #' @importFrom pheatmap pheatmap
 #' @importMethodsFrom SummarizedExperiment assay
 #' @importFrom scater uniquifyFeatureNames
+#' @importFrom matrixStats rowSds
 #' @export
 #' @return A \code{pheatmap} object.
 #' @author Ge Tan
@@ -62,7 +63,7 @@ olink_heatmap <- function(tb, se, p.value=0.05, log2FC=0, ...){
 #'                                   "20200625_Inflammation_NPX_2.xlsx"),
 #'                      package="OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
-#' se <- readNPX(npxFn, metaFn)$SummarizedExperiment
+#' se <- read_npx(npxFn, metaFn)$SummarizedExperiment
 #' overview_heatmap(se)
 overview_heatmap <- function(se, scale=c("none", "row", "column"),
                              cluster_samples=FALSE, cluster_features=FALSE,
@@ -79,7 +80,7 @@ overview_heatmap <- function(se, scale=c("none", "row", "column"),
                   ...)
   }else{
     if(scale == "row"){
-      toPlot <- toPlot[sapply(matrixStats::rowSds(toPlot), all.equal, 0) != "TRUE", , drop=FALSE]
+      toPlot <- toPlot[sapply(rowSds(toPlot), all.equal, 0) != "TRUE", , drop=FALSE]
       p <- pheatmap(toPlot, color=colorRampPalette(c("blue", "white", "red"))(100),
                     scale=scale, annotation_col=annotation_col,
                     cluster_rows=cluster_features, cluster_cols=cluster_samples,
