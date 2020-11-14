@@ -25,14 +25,19 @@ Given the \code{tibble} object from \code{olink_limma}, plot a heatmap of signif
 proteins.
 }
 \examples{
-npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
-                                  "20200625_Inflammation_NPX_2.xlsx"),
-                     package="OlinkR")
-metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
+npxFn <- system.file("extdata", c(
+  "20200507_Inflammation_NPX_1.xlsx",
+  "20200625_Inflammation_NPX_2.xlsx"
+),
+package = "OlinkR"
+)
+metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 se <- read_npx(npxFn, metaFn)$SummarizedExperiment
-tb <- olink_limma(se, factorCol="condition_Factor",
-                  contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
-                  blocking="Donor_Factor")
+tb <- olink_limma(se,
+  factorCol = "condition_Factor",
+  contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
+  blocking = "Donor_Factor"
+)
 olink_heatmap(tb, se)
 }
 \author{

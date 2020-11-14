@@ -8,10 +8,11 @@
 #' @param blocking \code{character}(1): The metadata column in \code{se} which serves as a blocking factor.
 #' @importMethodsFrom SummarizedExperiment assay rowData colData
 #' @importFrom limma makeContrasts lmFit contrasts.fit topTable eBayes
-#' @importFrom stringr str_split str_trim
+#' @importFrom stringr str_split str_trim str_replace
 #' @importFrom tibble tibble as_tibble
 #' @importFrom dplyr left_join
 #' @importFrom magrittr %>%
+#' @importFrom rlang has_name
 #' @export
 #' @return A \code{tibble} object of results from limma analysis
 #' @author Ge Tan
@@ -30,11 +31,11 @@
 #'   blocking = "Donor_Factor"
 #' )
 olink_limma <- function(se, factorCol, contrasts, blocking = NULL) {
-  if (!factorCol %in% colnames(colData(se))) {
+  if (!has_name(colData(se), factorCol)) {
     stop(factorCol, " column doesn't exist.")
   }
   if (!is.null(blocking)) {
-    if (!(blocking %in% colnames(colData(se)))) {
+    if (!has_name(colData(se), blocking)) {
       stop(blocking, " column doesn't exist.")
     }
     blocking <- factor(make.names(colData(se)[[blocking]]))
@@ -48,7 +49,7 @@ olink_limma <- function(se, factorCol, contrasts, blocking = NULL) {
   } else {
     design <- model.matrix(~ 0 + Treat + blocking)
   }
-  colnames(design) <- sub("^Treat", "", colnames(design))
+  colnames(design) <- str_replace(colnames(design), "^Treat", "")
   fit <- lmFit(eset, design)
 
   cm <- makeContrasts(contrasts = contrasts, levels = design)

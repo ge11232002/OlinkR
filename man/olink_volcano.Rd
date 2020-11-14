@@ -24,14 +24,19 @@ The log2FC is on the x-axis and -log10(P.value) is on y-axis.
 By default, significant proteins are labeled on the volcano plot.
 }
 \examples{
-npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
-                                  "20200625_Inflammation_NPX_2.xlsx"),
-                     package="OlinkR")
-metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
+npxFn <- system.file("extdata", c(
+  "20200507_Inflammation_NPX_1.xlsx",
+  "20200625_Inflammation_NPX_2.xlsx"
+),
+package = "OlinkR"
+)
+metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 se <- read_npx(npxFn, metaFn)$SummarizedExperiment
-tb <- olink_limma(se, factorCol="condition_Factor",
-                  contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
-                  blocking="Donor_Factor")
+tb <- olink_limma(se,
+  factorCol = "condition_Factor",
+  contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
+  blocking = "Donor_Factor"
+)
 olink_volcano(tb)
 }
 \author{

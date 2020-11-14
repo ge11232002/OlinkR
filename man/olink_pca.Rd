@@ -25,12 +25,16 @@ Given a \code{SummarizedExperiment} object, perform the PCA analysis implemented
 in Bioconductor package \code{PCAtools}
 }
 \examples{
-npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
-                                  "20200625_Inflammation_NPX_2.xlsx"),
-                     package="OlinkR")
-metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
+npxFn <- system.file("extdata", c(
+  "20200507_Inflammation_NPX_1.xlsx",
+  "20200625_Inflammation_NPX_2.xlsx"
+),
+package = "OlinkR"
+)
+metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 se <- read_npx(npxFn, metaFn)$SummarizedExperiment
-ans <- olink_pca(se, colby="condition_Factor", shape="Donor_Factor", metavars="Weight_Numeric")
+ans <- olink_pca(se, colby = "condition_Factor", shape = "Donor_Factor",
+                 metavars = "Weight_Numeric")
 }
 \author{
 Ge Tan

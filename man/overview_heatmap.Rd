@@ -32,10 +32,13 @@ A \code{pheatmap} object.
 Plot the NPX value in a heatmap to spot any potential clustering and outliers
 }
 \examples{
-npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
-                                  "20200625_Inflammation_NPX_2.xlsx"),
-                     package="OlinkR")
-metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
+npxFn <- system.file("extdata", c(
+  "20200507_Inflammation_NPX_1.xlsx",
+  "20200625_Inflammation_NPX_2.xlsx"
+),
+package = "OlinkR"
+)
+metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 se <- read_npx(npxFn, metaFn)$SummarizedExperiment
 overview_heatmap(se)
 }

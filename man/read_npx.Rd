@@ -26,10 +26,13 @@ Only the samples in metadata file are kept.
 If some samples from metadata file don't exists in NPX file, it gives an error.
 }
 \examples{
-npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
-                                  "20200625_Inflammation_NPX_2.xlsx"),
-                     package="OlinkR")
-metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
+npxFn <- system.file("extdata", c(
+  "20200507_Inflammation_NPX_1.xlsx",
+  "20200625_Inflammation_NPX_2.xlsx"
+),
+package = "OlinkR"
+)
+metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 read_npx(npxFn, metaFn)
 }
 \author{

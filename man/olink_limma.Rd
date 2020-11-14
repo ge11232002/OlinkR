@@ -22,14 +22,19 @@ A \code{tibble} object of results from limma analysis
 Given a \code{SummarizedExperiment} object, perform two groups comparison with \code{limma} package.
 }
 \examples{
-npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
-                                  "20200625_Inflammation_NPX_2.xlsx"),
-                     package="OlinkR")
-metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
+npxFn <- system.file("extdata", c(
+  "20200507_Inflammation_NPX_1.xlsx",
+  "20200625_Inflammation_NPX_2.xlsx"
+),
+package = "OlinkR"
+)
+metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 se <- read_npx(npxFn, metaFn)$SummarizedExperiment
-tb <- olink_limma(se, factorCol="condition_Factor",
-                  contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
-                  blocking="Donor_Factor")
+tb <- olink_limma(se,
+  factorCol = "condition_Factor",
+  contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
+  blocking = "Donor_Factor"
+)
 }
 \author{
 Ge Tan
