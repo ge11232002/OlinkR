@@ -23,55 +23,77 @@
 #'         \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
 #' @author Ge Tan
 #' @examples
-#' npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
-#'                                   "20200625_Inflammation_NPX_2.xlsx"),
-#'                      package="OlinkR")
-#' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
+#' npxFn <- system.file("extdata", c(
+#'   "20200507_Inflammation_NPX_1.xlsx",
+#'   "20200625_Inflammation_NPX_2.xlsx"
+#' ),
+#' package = "OlinkR"
+#' )
+#' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' read_npx(npxFn, metaFn)
-
-read_npx <- function(npxFn, metaFn){
+read_npx <- function(npxFn, metaFn) {
   npx <- lapply(npxFn, read_NPX)
   npx <- bind_rows(npx)
-  if(length(unique(npx$Panel)) > 1L){
+  if (length(unique(npx$Panel)) > 1L) {
     stop("NPX value from different panels cannot be mixed!")
   }
-  npx <- npx %>% mutate(NPX=if_else(is.na(NPX), LOD,  NPX),
-                        isLOD=NPX <= LOD,
-                        MissingFreq=as.numeric(MissingFreq))
+  npx <- npx %>% mutate(
+    NPX = if_else(is.na(NPX), LOD, NPX),
+    isLOD = NPX <= LOD,
+    MissingFreq = as.numeric(MissingFreq)
+  )
   meta <- read_excel(metaFn)
   colnames(meta) <- make.names(colnames(meta))
-  meta <- meta %>% select("SampleID", contains("_Factor"),
-                          contains("_Numeric"))
+  meta <- meta %>% select(
+    "SampleID", contains("_Factor"),
+    contains("_Numeric")
+  )
 
-  if(length(setdiff(npx$SampleID, meta$SampleID)) != 0L){
-    warning("SampleID (",
-            str_c(setdiff(npx$SampleID, meta$SampleID), collapse=", "),
-            ") is/are not in metadata.")
+  if (length(setdiff(npx$SampleID, meta$SampleID)) != 0L) {
+    warning(
+      "SampleID (",
+      str_c(setdiff(npx$SampleID, meta$SampleID), collapse = ", "),
+      ") is/are not in metadata."
+    )
   }
-  if(length(setdiff(meta$SampleID, npx$SampleID)) != 0L){
-    stop("SampleID (",
-         str_c(setdiff(meta$SampleID, npx$SampleID), collapse=", "),
-         ") is/are not in NPX data.")
+  if (length(setdiff(meta$SampleID, npx$SampleID)) != 0L) {
+    stop(
+      "SampleID (",
+      str_c(setdiff(meta$SampleID, npx$SampleID), collapse = ", "),
+      ") is/are not in NPX data."
+    )
   }
 
   npx <- npx %>% right_join(meta)
 
   ## Build SummarizedExperiment object ------------------------------
-  npxMat <- npx %>% select(SampleID, OlinkID, NPX) %>%
-    acast(OlinkID~SampleID, value.var = "NPX")
-  lodMat <- npx %>% select(SampleID, OlinkID, LOD) %>%
-    acast(OlinkID~SampleID, value.var = "LOD")
-  colData <- npx %>% select(PlateID, colnames(meta)) %>% unique()
-  colData <- data.frame(row.names=colData$SampleID, select(colData, -SampleID),
-                        check.names = FALSE)
-  rowData <- npx %>% select(OlinkID, UniProt, Assay, Panel, MissingFreq) %>%
+  npxMat <- npx %>%
+    select(SampleID, OlinkID, NPX) %>%
+    acast(OlinkID ~ SampleID, value.var = "NPX")
+  lodMat <- npx %>%
+    select(SampleID, OlinkID, LOD) %>%
+    acast(OlinkID ~ SampleID, value.var = "LOD")
+  colData <- npx %>%
+    select(PlateID, colnames(meta)) %>%
+    unique()
+  colData <- data.frame(
+    row.names = colData$SampleID, select(colData, -SampleID),
+    check.names = FALSE
+  )
+  rowData <- npx %>%
+    select(OlinkID, UniProt, Assay, Panel, MissingFreq) %>%
     group_by(OlinkID, UniProt, Assay, Panel) %>%
-    summarise(MissingFreq=median(MissingFreq)) %>% ungroup()
-  rowData <- data.frame(row.names=rowData$OlinkID, select(rowData, -OlinkID),
-                        check.names = FALSE)
+    summarise(MissingFreq = median(MissingFreq)) %>%
+    ungroup()
+  rowData <- data.frame(
+    row.names = rowData$OlinkID, select(rowData, -OlinkID),
+    check.names = FALSE
+  )
 
-  se <- SummarizedExperiment(assays=list(npx=npxMat, npxQCFlag=npxMat>lodMat),
-                             colData=colData[colnames(npxMat), ],
-                             rowData=rowData[rownames(npxMat), ])
-  return(list(tibble=npx, SummarizedExperiment=se))
+  se <- SummarizedExperiment(
+    assays = list(npx = npxMat, npxQCFlag = npxMat > lodMat),
+    colData = colData[colnames(npxMat), ],
+    rowData = rowData[rownames(npxMat), ]
+  )
+  return(list(tibble = npx, SummarizedExperiment = se))
 }

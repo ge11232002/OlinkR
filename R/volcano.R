@@ -17,37 +17,49 @@
 #' @return A \code{ggplot} object.
 #' @author Ge Tan
 #' @examples
-#' npxFn <- system.file("extdata", c("20200507_Inflammation_NPX_1.xlsx",
-#'                                   "20200625_Inflammation_NPX_2.xlsx"),
-#'                      package="OlinkR")
-#' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package="OlinkR")
+#' npxFn <- system.file("extdata", c(
+#'   "20200507_Inflammation_NPX_1.xlsx",
+#'   "20200625_Inflammation_NPX_2.xlsx"
+#' ),
+#' package = "OlinkR"
+#' )
+#' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' se <- read_npx(npxFn, metaFn)$SummarizedExperiment
-#' tb <- olink_limma(se, factorCol="condition_Factor",
-#'                   contrasts="Glucose.10mM.Vehicle - Vehicle.Vehicle",
-#'                   blocking="Donor_Factor")
+#' tb <- olink_limma(se,
+#'   factorCol = "condition_Factor",
+#'   contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
+#'   blocking = "Donor_Factor"
+#' )
 #' olink_volcano(tb)
-
-olink_volcano <- function(tb, p.value=0.05, log2FC=0, olinkIds=NULL){
-  tb <- tb %>% mutate(type=case_when(P.Value <= p.value & abs(logFC) >= log2FC & isPresent~"Significant",
-                                     (P.Value > p.value | abs(logFC) < log2FC) & isPresent~"Non-significant",
-                                     TRUE~"Absent"))
-  if(is.null(olinkIds)){
-    olinkIds <- tb %>% filter(type == "Significant") %>% pull(OlinkID)
+olink_volcano <- function(tb, p.value = 0.05, log2FC = 0, olinkIds = NULL) {
+  tb <- tb %>% mutate(type = case_when(
+    P.Value <= p.value & abs(logFC) >= log2FC & isPresent ~ "Significant",
+    (P.Value > p.value | abs(logFC) < log2FC) & isPresent ~ "Non-significant",
+    TRUE ~ "Absent"
+  ))
+  if (is.null(olinkIds)) {
+    olinkIds <- tb %>%
+      filter(type == "Significant") %>%
+      pull(OlinkID)
   }
 
   p <- ggplot(tb %>% arrange(type), aes(logFC, -log10(P.Value))) +
-    geom_point(aes(col=type)) +
-    geom_label_repel(data = filter(tb, OlinkID %in% olinkIds),
-                     aes(label = Assay), box.padding = 1,
-                     segment.color = 'grey50') +
-    scale_color_manual(values=c("Significant"="red", "Non-significant"="black",
-                                "Absent"="gray")) +
-    geom_hline(yintercept = -log10(p.value), linetype="dotted") +
-    geom_vline(xintercept = log2FC, linetype="dotted") +
-    geom_vline(xintercept = -log2FC, linetype="dotted") +
+    geom_point(aes(col = type)) +
+    geom_label_repel(
+      data = filter(tb, OlinkID %in% olinkIds),
+      aes(label = Assay), box.padding = 1,
+      segment.color = "grey50"
+    ) +
+    scale_color_manual(values = c(
+      "Significant" = "red", "Non-significant" = "black",
+      "Absent" = "gray"
+    )) +
+    geom_hline(yintercept = -log10(p.value), linetype = "dotted") +
+    geom_vline(xintercept = log2FC, linetype = "dotted") +
+    geom_vline(xintercept = -log2FC, linetype = "dotted") +
     xlab(expression(paste(log[2], "FC"))) +
     ylab(expression(paste(-log[10], "pvalue"))) +
-    scale_x_continuous(limits=c(-1.2*max(abs(tb$logFC)), 1.2*max(abs(tb$logFC)))) +
+    scale_x_continuous(limits = c(-1.2 * max(abs(tb$logFC)), 1.2 * max(abs(tb$logFC)))) +
     theme_cowplot()
 
   return(p)
