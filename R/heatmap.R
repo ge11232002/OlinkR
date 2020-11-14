@@ -9,6 +9,8 @@
 #' @param ... graphical parameter passed to \code{pheatmap}.
 #' @importFrom pheatmap pheatmap
 #' @importFrom scater uniquifyFeatureNames
+#' @importFrom magrittr %>%
+#' @importFrom grDevices colorRampPalette
 #' @export
 #' @return A \code{pheatmap} object.
 #' @author Ge Tan

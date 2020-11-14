@@ -13,6 +13,11 @@
 #' @importFrom readxl read_excel
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom reshape2 acast
+#' @importFrom dplyr select right_join group_by summarise ungroup bind_rows mutate if_else
+#' @importFrom tidyselect contains
+#' @importFrom stringr str_c
+#' @importFrom magrittr %>%
+#' @importFrom stats median model.matrix
 #' @export
 #' @return A list with two objects: a \code{\link[tibble]{tibble}} in long format and a
 #'         \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
@@ -51,7 +56,7 @@ read_npx <- function(npxFn, metaFn){
 
   npx <- npx %>% right_join(meta)
 
-  ## Build SummarizedExperiment object
+  ## Build SummarizedExperiment object ------------------------------
   npxMat <- npx %>% select(SampleID, OlinkID, NPX) %>%
     acast(OlinkID~SampleID, value.var = "NPX")
   lodMat <- npx %>% select(SampleID, OlinkID, LOD) %>%

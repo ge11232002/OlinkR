@@ -10,7 +10,9 @@
 #' @param removeVar \code{numeric}(1): Remove this fraction of variables based on low variance. DEFAULT = 0.1. OPTIONAL.
 #' @importFrom PCAtools pca parallelPCA findElbowPoint screeplot pairsplot biplot plotloadings eigencorplot getComponents
 #' @importFrom scater uniquifyFeatureNames
+#' @importFrom ggplot2 geom_text aes
 #' @importMethodsFrom SummarizedExperiment assay colData
+#' @importFrom utils head
 #' @export
 #' @return A list of \code{ggplot} and \code{tibble} objects.
 #' @author Ge Tan

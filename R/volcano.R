@@ -10,6 +10,9 @@
 #' @param olinkIds \code{character}(n): OlinkIDs to label on the volcano plot.
 #' @importFrom cowplot theme_cowplot
 #' @importFrom ggrepel geom_label_repel
+#' @importFrom dplyr mutate case_when filter arrange pull
+#' @importFrom magrittr %>%
+#' @importFrom ggplot2 ggplot aes geom_point scale_color_manual scale_x_continuous geom_hline geom_vline xlab ylab
 #' @export
 #' @return A \code{ggplot} object.
 #' @author Ge Tan
