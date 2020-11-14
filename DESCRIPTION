@@ -15,4 +15,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Depends: R (>= 4.0), tidyverse (>= 1.3.0)
 Imports: OlinkAnalyze (>= 1.0.2), PCAtools, SummarizedExperiment, cowplot,
-         ggrepel, limma, pheatmap, readxl, reshape2, scater
+         ggrepel, limma, pheatmap, readxl, reshape2, scater, matrixStats
