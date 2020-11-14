@@ -17,7 +17,7 @@ A list with two objects: a \code{\link[tibble]{tibble}} in long format and a
 }
 \description{
 Read one or more NPX files from Olink NPX manager and
-one metadata file in execel format.
+one metadata file in excel format.
 }
 \details{
 The metadata excel file shall have column \dQuote{SampleID} and other metadata column that ends with \dQuote{_Factor} (mandatory )or \dQuote{_Numeric} (optional).
