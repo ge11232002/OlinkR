@@ -57,8 +57,8 @@ olink_volcano <- function(tb, p.value = 0.05, log2FC = 0, olinkIds = NULL) {
     geom_hline(yintercept = -log10(p.value), linetype = "dotted") +
     geom_vline(xintercept = log2FC, linetype = "dotted") +
     geom_vline(xintercept = -log2FC, linetype = "dotted") +
-    xlab(expression(str_c(log[2], "FC", sep=" "))) +
-    ylab(expression(str_c(-log[10], "pvalue", sep=" "))) +
+    xlab(expression(str_c(log[2], "FC", sep = " "))) +
+    ylab(expression(str_c(-log[10], "pvalue", sep = " "))) +
     scale_x_continuous(limits = c(-1.2 * max(abs(tb$logFC)), 1.2 * max(abs(tb$logFC)))) +
     theme_cowplot()
 

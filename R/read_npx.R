@@ -75,7 +75,8 @@ read_npx <- function(npxFn, metaFn) {
     select(PlateID, colnames(meta)) %>%
     unique()
   colData <- data.frame(
-    select(colData, -SampleID), row.names = colData$SampleID, check.names = FALSE
+    select(colData, -SampleID),
+    row.names = colData$SampleID, check.names = FALSE
   )
   rowData <- npx %>%
     select(OlinkID, UniProt, Assay, Panel, MissingFreq) %>%
@@ -83,7 +84,8 @@ read_npx <- function(npxFn, metaFn) {
     summarise(MissingFreq = median(MissingFreq)) %>%
     ungroup()
   rowData <- data.frame(
-    select(rowData, -OlinkID), row.names = rowData$OlinkID, check.names = FALSE
+    select(rowData, -OlinkID),
+    row.names = rowData$OlinkID, check.names = FALSE
   )
 
   se <- SummarizedExperiment(
