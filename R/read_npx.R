@@ -95,3 +95,26 @@ read_npx <- function(npxFn, metaFn) {
   )
   return(list(tibble = npx, SummarizedExperiment = se))
 }
+
+#' List panels from NPX files
+#'
+#' Read through the given NPX files and return all panels inside
+#'
+#' @param npxFn Path to NPX files
+#' @importFrom OlinkAnalyze read_NPX
+#' @importFrom purrr map_dfr
+#' @export
+#' @return A \code{character}(n) object.
+#' @author Ge Tan
+#' @examples
+#' npxFn <- system.file("extdata", c(
+#'   "2019-01-02_20181145_Akdis_Nasal_NPX_LOD.xlsx"
+#' ),
+#' package = "OlinkR"
+#' )
+#' list_panels(npxFn)
+list_panels <- function(npxFn) {
+  npx <- map_dfr(npxFn, read_NPX)
+  panels <- unique(npx$Panel)
+  return(panels)
+}
