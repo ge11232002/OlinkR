@@ -33,8 +33,10 @@ package = "OlinkR"
 )
 metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 se <- read_npx(npxFn, metaFn)$SummarizedExperiment
-ans <- olink_pca(se, colby = "condition_Factor", shape = "Donor_Factor",
-                 metavars = "Weight_Numeric")
+ans <- olink_pca(se,
+  colby = "condition_Factor", shape = "Donor_Factor",
+  metavars = "Weight_Numeric"
+)
 }
 \author{
 Ge Tan
