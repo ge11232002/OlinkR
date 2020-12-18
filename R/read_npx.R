@@ -9,6 +9,8 @@
 #' If some samples from metadata file don't exists in NPX file, it gives an error.
 #' @param npxFn Path to NPX files
 #' @param metaFn Path to metadata excel file
+#' @param panel \code{character}(1): the panel to load.
+#'              By default, the first panel in the data will be loaded.
 #' @importFrom OlinkAnalyze read_NPX
 #' @importFrom readxl read_excel
 #' @importFrom SummarizedExperiment SummarizedExperiment
@@ -32,15 +34,25 @@
 #' )
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' read_npx(npxFn, metaFn)
-read_npx <- function(npxFn, metaFn) {
+read_npx <- function(npxFn, metaFn, panel = NULL) {
   npx <- map_dfr(npxFn, read_NPX)
-  if (length(unique(npx$Panel)) > 1L) {
-    stop("NPX value from different panels cannot be mixed!")
+  if (is.null(panel)) {
+    panel <- unique(npx$Panel) %>% head(1)
   }
-  npx <- npx %>% mutate(
-    NPX = if_else(is.na(NPX), LOD, NPX), isLOD = NPX <= LOD,
-    MissingFreq = as.numeric(MissingFreq)
-  )
+  if (length(panel) != 1) {
+    stop("This function only reads one panel each time.")
+  }
+  if (!panel %in% npx$Panel) {
+    stop("The panel ", panel, " is not available")
+  }
+  message("Loading the data from panel: ", panel)
+
+  npx <- npx %>%
+    filter(Panel == panel) %>%
+    mutate(
+      NPX = if_else(is.na(NPX), LOD, NPX), isLOD = NPX <= LOD,
+      MissingFreq = as.numeric(MissingFreq)
+    )
   meta <- read_excel(metaFn)
   colnames(meta) <- make.names(colnames(meta))
   meta <- meta %>% select(

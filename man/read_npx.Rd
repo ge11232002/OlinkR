@@ -4,12 +4,15 @@
 \alias{read_npx}
 \title{Read NPX and metadata file together}
 \usage{
-read_npx(npxFn, metaFn)
+read_npx(npxFn, metaFn, panel = NULL)
 }
 \arguments{
 \item{npxFn}{Path to NPX files}
 
 \item{metaFn}{Path to metadata excel file}
+
+\item{panel}{\code{character}(1): the panel to load.
+By default, the first panel in the data will be loaded.}
 }
 \value{
 A list with two objects: a \code{\link[tibble]{tibble}} in long format and a
