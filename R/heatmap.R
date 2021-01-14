@@ -12,7 +12,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom grDevices colorRampPalette
 #' @export
-#' @return A invisible \code{pheatmap} object.
+#' @return An invisible \code{pheatmap} object.
 #' @author Ge Tan
 #' @examples
 #' npxFn <- system.file("extdata", c(
