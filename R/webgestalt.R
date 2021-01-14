@@ -31,18 +31,24 @@ webgestalt_prep <- function(x, pvalue=0.01, log2FC=0, dir="."){
   dir.create(dir, recursive = TRUE)
 
 # ORA files ---------------------------------------------------------------
-  tb_ora <- x %>% filter(abs(logFC) >= log2FC, P.Value <= pvalue) %>%
+  tb_ora <- x %>% filter(logFC > log2FC, P.Value <= pvalue) %>%
     pull(UniProt)
-  write_lines(tb_ora, file = file.path(dir, "webgestalt_ora.tsv"))
+  write_lines(tb_ora, file = file.path(dir, "webgestalt_upregulated_ora.txt"))
+
+  tb_ora <- x %>% filter(logFC < -log2FC, P.Value <= pvalue) %>%
+    pull(UniProt)
+  write_lines(tb_ora, file = file.path(dir, "webgestalt_downregulated_ora.txt"))
 
 # GSEA --------------------------------------------------------------------
   tb_gsea <- x %>% select(UniProt, logFC)
-  write_tsv(tb_gsea, file = file.path(dir, "webgestalt_gsea.tsv"),
+  write_tsv(tb_gsea, file = file.path(dir, "webgestalt_gsea.rnk"),
             col_names = FALSE)
 
 # Background --------------------------------------------------------------
   tb_background <- x %>% pull(UniProt)
-  write_lines(tb_background, file = file.path(dir, "webgestalt_background.tsv"))
+  write_lines(tb_background, file = file.path(dir, "webgestalt_background.txt"))
 
-  invisible(file.path(dir, c("webgestalt_ora.tsv", "webgestalt_gsea.tsv", "webgestalt_background.tsv")))
+  invisible(file.path(dir, c("webgestalt_upregulated_ora.txt",
+                             "webgestalt_downregulated_ora.txt",
+                             "webgestalt_gsea.rnk", "webgestalt_background.txt")))
 }
