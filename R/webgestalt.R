@@ -28,6 +28,8 @@
 #' files <- webgestalt_prep(se)
 #' file.remove(files)
 webgestalt_prep <- function(x, pvalue=0.01, log2FC=0, dir="."){
+  dir.create(dir, recursive = TRUE)
+
 # ORA files ---------------------------------------------------------------
   tb_ora <- x %>% filter(abs(logFC) >= log2FC, P.Value <= pvalue) %>%
     pull(UniProt)
