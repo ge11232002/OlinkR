@@ -12,7 +12,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom grDevices colorRampPalette
 #' @export
-#' @return A \code{pheatmap} object.
+#' @return A invisible \code{pheatmap} object.
 #' @author Ge Tan
 #' @examples
 #' npxFn <- system.file("extdata", c(
@@ -48,7 +48,7 @@ olink_heatmap <- function(tb, se, p.value = 0.05, log2FC = 0, ...) {
     cluster_rows = if_else(nrow(toPlot) >= 2, TRUE, FALSE),
     cluster_cols = FALSE, ...
   )
-  return(p)
+  invisible(p)
 }
 
 #' A overview of NPX value in heatmap

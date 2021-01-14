@@ -18,7 +18,7 @@ olink_heatmap(tb, se, p.value = 0.05, log2FC = 0, ...)
 \item{...}{graphical parameter passed to \code{pheatmap}.}
 }
 \value{
-A \code{pheatmap} object.
+A invisible \code{pheatmap} object.
 }
 \description{
 Given the \code{tibble} object from \code{olink_limma}, plot a heatmap of significant
