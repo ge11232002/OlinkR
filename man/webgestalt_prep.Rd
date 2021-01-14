@@ -7,7 +7,7 @@
 webgestalt_prep(x, pvalue = 0.01, log2FC = 0, dir = ".")
 }
 \arguments{
-\item{x}{A \code{tibble} object from \code{\link[olink_limma]} function.}
+\item{x}{A \code{tibble} object from \code{olink_limma} function.}
 
 \item{pvalue}{The p-value to filter for significant proteins. The default is 0.01.}
 
@@ -16,7 +16,7 @@ webgestalt_prep(x, pvalue = 0.01, log2FC = 0, dir = ".")
 \item{dir}{The output folder. The default is current working directory.}
 }
 \value{
-An invisible character object with exported filenames.
+An invisible character object with exported file names.
 }
 \description{
 Given a \code{tibble} object of the results returned from \code{olink_limma} function, generate the files for upload to webgestalt website.

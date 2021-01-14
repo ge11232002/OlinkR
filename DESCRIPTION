@@ -16,4 +16,5 @@ RoxygenNote: 7.1.1
 Depends: R (>= 4.0)
 Imports: OlinkAnalyze (>= 1.0.2), PCAtools, SummarizedExperiment, cowplot,
          ggrepel, limma, pheatmap, readxl, reshape2, scater, matrixStats,
-         stringr, dplyr, tibble, tidyselect, magrittr, ggplot2, rlang, purrr
+         stringr, dplyr, tibble, tidyselect, magrittr, ggplot2, rlang, purrr,
+         readr

@@ -2,14 +2,14 @@
 #'
 #' Given a \code{tibble} object of the results returned from \code{olink_limma} function, generate the files for upload to webgestalt website.
 #'
-#' @param x A \code{tibble} object from \code{\link[olink_limma]} function.
+#' @param x A \code{tibble} object from \code{olink_limma} function.
 #' @param pvalue The p-value to filter for significant proteins. The default is 0.01.
 #' @param log2FC The log2 fold change cut-off to filter for significant proteins. The default is 0, i.e. no filtering.
 #' @param dir The output folder. The default is current working directory.
 #' @importFrom readr write_lines write_tsv
 #' @importFrom dplyr filter pull select
 #' @export
-#' @return An invisible character object with exported filenames.
+#' @return An invisible character object with exported file names.
 #' @author Ge Tan
 #' @examples
 #' npxFn <- system.file("extdata", c(
