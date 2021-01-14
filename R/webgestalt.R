@@ -29,17 +29,17 @@
 #' file.remove(files)
 webgestalt_prep <- function(x, pvalue=0.01, log2FC=0, dir="."){
 # ORA files ---------------------------------------------------------------
-  tb_ora <- tb %>% filter(abs(logFC) >= log2FC, P.Value <= pvalue) %>%
+  tb_ora <- x %>% filter(abs(logFC) >= log2FC, P.Value <= pvalue) %>%
     pull(UniProt)
   write_lines(tb_ora, file = file.path(dir, "webgestalt_ora.tsv"))
 
 # GSEA --------------------------------------------------------------------
-  tb_gsea <- tb %>% select(UniProt, logFC)
+  tb_gsea <- x %>% select(UniProt, logFC)
   write_tsv(tb_gsea, file = file.path(dir, "webgestalt_gsea.tsv"),
             col_names = FALSE)
 
 # Background --------------------------------------------------------------
-  tb_background <- tb %>% pull(UniProt)
+  tb_background <- x %>% pull(UniProt)
   write_lines(tb_background, file = file.path(dir, "webgestalt_background.tsv"))
 
   invisible(file.path(dir, c("webgestalt_ora.tsv", "webgestalt_gsea.tsv", "webgestalt_background.tsv")))
