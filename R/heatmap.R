@@ -40,7 +40,9 @@ olink_heatmap <- function(tb, se, p.value = 0.05, log2FC = 0, ...) {
     as.matrix()
   rownames(toPlot) <- uniquifyFeatureNames(tb$OlinkID, tb$Assay)
 
-  annotation_col <- data.frame(colData(se), check.names = FALSE)
+  annotation_col <- data.frame(colData(se)[colnames(toPlot), ],
+                               check.names = FALSE)
+  annotation_col <- Filter(function(y) !all(is.na(y)), annotation_col)
 
   p <- pheatmap(toPlot,
     color = colorRampPalette(c("blue", "white", "red"))(100),
