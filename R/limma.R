@@ -31,13 +31,17 @@
 #'   blocking = "Donor_Factor"
 #' )
 olink_limma <- function(se, factorCol, contrasts, blocking = NULL) {
+  selectedGroups <- str_split(contrasts, pattern = "(-|\\(|\\))")[[1]] %>%
+    str_trim()
   if (!has_name(colData(se), factorCol)) {
     stop(factorCol, " column doesn't exist.")
   }
+  se <- se[ ,colData(se)[[factorCol]] %in% selectedGroups]
   if (!is.null(blocking)) {
     if (!has_name(colData(se), blocking)) {
       stop(blocking, " column doesn't exist.")
     }
+    se <- se[ ,!is.na(colData(se)[[blocking]])]
     blocking <- factor(make.names(colData(se)[[blocking]]))
   }
 
@@ -60,8 +64,6 @@ olink_limma <- function(se, factorCol, contrasts, blocking = NULL) {
   ans <- as_tibble(ans, rownames = "OlinkID")
   ans <- ans %>% left_join(as_tibble(rowData(se), rownames = "OlinkID"))
 
-  selectedGroups <- str_split(contrasts, pattern = "(-|\\(|\\))")[[1]] %>%
-    str_trim()
   selectedCols <- list()
   for (j in 1:length(selectedGroups)) {
     selectedCols[[j]] <- which(Treat == selectedGroups[j])

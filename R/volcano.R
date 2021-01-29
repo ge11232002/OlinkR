@@ -48,7 +48,7 @@ olink_volcano <- function(tb, p.value = 0.05, log2FC = 0, olinkIds = NULL) {
     geom_label_repel(
       data = filter(tb, OlinkID %in% olinkIds),
       aes(label = Assay), box.padding = 1,
-      segment.color = "grey50", max.overlaps = 20
+      segment.color = "grey50", max.overlaps = 40
     ) +
     scale_color_manual(values = c(
       "Significant" = "red", "Non-significant" = "black",
