@@ -25,7 +25,7 @@
 #'   contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
 #'   blocking = "Donor_Factor"
 #' )
-#' files <- webgestalt_prep(se)
+#' files <- webgestalt_prep(tb)
 #' file.remove(files)
 webgestalt_prep <- function(x, pvalue = 0.01, log2FC = 0, dir = ".") {
   dir.create(dir, recursive = TRUE)

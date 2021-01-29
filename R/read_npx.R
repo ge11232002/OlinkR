@@ -15,7 +15,7 @@
 #' @importFrom readxl read_excel
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom reshape2 acast
-#' @importFrom dplyr select right_join group_by summarise ungroup bind_rows mutate if_else
+#' @importFrom dplyr select right_join group_by summarise ungroup bind_rows mutate if_else rename_with across
 #' @importFrom tidyselect contains
 #' @importFrom stringr str_c
 #' @importFrom magrittr %>%
@@ -54,10 +54,11 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
       MissingFreq = as.numeric(MissingFreq)
     )
   meta <- read_excel(metaFn)
-  colnames(meta) <- make.names(colnames(meta))
+  meta <- rename_with(meta, make.names)
   meta <- meta %>% select(
-    "SampleID", contains("_Factor"), contains("_Numeric")
-  )
+    "SampleID", ends_with("_Factor"), ends_with("_Numeric")
+  ) %>%
+    mutate(across(ends_with("_Factor"), make.names))
 
   if (length(setdiff(npx$SampleID, meta$SampleID)) != 0L) {
     warning(

@@ -35,7 +35,7 @@ tb <- olink_limma(se,
   contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
   blocking = "Donor_Factor"
 )
-files <- webgestalt_prep(se)
+files <- webgestalt_prep(tb)
 file.remove(files)
 }
 \author{

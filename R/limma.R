@@ -42,11 +42,11 @@ olink_limma <- function(se, factorCol, contrasts, blocking = NULL) {
       stop(blocking, " column doesn't exist.")
     }
     se <- se[ ,!is.na(colData(se)[[blocking]])]
-    blocking <- factor(make.names(colData(se)[[blocking]]))
+    blocking <- factor(colData(se)[[blocking]])
   }
 
   eset <- assay(se, "npx")
-  Treat <- factor(make.names(se[[factorCol]]))
+  Treat <- factor(se[[factorCol]])
 
   if (is.null(blocking)) {
     design <- model.matrix(~ 0 + Treat)
