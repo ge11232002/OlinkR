@@ -58,7 +58,7 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
   meta <- meta %>% select(
     "SampleID", ends_with("_Factor"), ends_with("_Numeric")
   ) %>%
-    mutate(across(ends_with("_Factor"), make.names))
+    mutate(across(ends_with("_Factor"), function(x){res=make.names(x);res[is.na(x)]=NA;res}))
 
   if (length(setdiff(npx$SampleID, meta$SampleID)) != 0L) {
     warning(
