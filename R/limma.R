@@ -36,7 +36,7 @@ olink_limma <- function(se, factorCol, contrasts, blocking = NULL) {
   if (!has_name(colData(se), factorCol)) {
     stop(factorCol, " column doesn't exist.")
   }
-  se <- se[ ,colData(se)[[factorCol]] %in% selectedGroups]
+  se <- se[ ,!is.na(colData(se)[[factorCol]])]
   if (!is.null(blocking)) {
     if (!has_name(colData(se), blocking)) {
       stop(blocking, " column doesn't exist.")
