@@ -11,16 +11,16 @@
 #' @param metaFn Path to metadata excel file
 #' @param panel \code{character}(1): the panel to load.
 #'              By default, the first panel in the data will be loaded.
-#' @importFrom OlinkAnalyze read_NPX
+#' @importFrom OlinkAnalyze read_NPX olink_normalization
 #' @importFrom readxl read_excel
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom reshape2 acast
 #' @importFrom dplyr select right_join group_by summarise ungroup bind_rows mutate if_else rename_with across
-#' @importFrom tidyselect contains
+#' @importFrom tidyselect contains all_of
 #' @importFrom stringr str_c
 #' @importFrom magrittr %>%
 #' @importFrom stats median model.matrix
-#' @importFrom purrr map_dfr
+#' @importFrom purrr map reduce
 #' @export
 #' @return A list with two objects: a \code{\link[tibble]{tibble}} in long format and a
 #'         \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
@@ -35,7 +35,33 @@
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' read_npx(npxFn, metaFn)
 read_npx <- function(npxFn, metaFn, panel = NULL) {
-  npx <- map_dfr(npxFn, read_NPX)
+  npxList <- map(npxFn, read_NPX)
+  ## Sometimes, the NPX files can have different columns from different versions of NPX managers
+  overlapCols <- map(npxList, colnames) %>% reduce(intersect)
+  npxList <- map(npxList, select, all_of(overlapCols))
+
+  repeatedSamples <- map(npxList, function(x){unique(x$SampleID)}) %>%
+    reduce(intersect)
+
+  if(length(repeatedSamples) > 0){
+    message("Doing reference samples normalisation.")
+    if(length(npxList) != 2){
+      stop("The reference samples normalisation can only handle two assays.")
+      # TODO: if needed, it's possible to extend to more assays.
+      #       It's important to choose a reference for all.
+    }
+    if(length(repeatedSamples) < 8){
+      warning("The minimal number of bridging samples for normalisation is 8, you have ", length(repeatedSamples))
+    }
+    npx <- olink_normalization(df1 = npxList[[1]], df2 = npxList[[2]],
+                               overlapping_samples_df1 = repeatedSamples)
+  }else{
+    # npx <- map_dfr(npxFn, read_NPX)
+    npx <- bind_rows(npxList)
+  }
+
+  npx <- npx %>% mutate(Panel = .renamePanels(Panel))
+
   if (is.null(panel)) {
     panel <- unique(npx$Panel) %>% head(1)
   }
@@ -58,7 +84,8 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
   meta <- meta %>% select(
     "SampleID", ends_with("_Factor"), ends_with("_Numeric")
   ) %>%
-    mutate(across(ends_with("_Factor"), function(x){res=make.names(x);res[is.na(x)]=NA;res}))
+    mutate(across(ends_with("_Factor"),
+                  function(x){res=make.names(x);res[is.na(x)]=NA;res}))
 
   if (length(setdiff(npx$SampleID, meta$SampleID)) != 0L) {
     warning(
@@ -86,7 +113,8 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
     acast(OlinkID ~ SampleID, value.var = "LOD")
   colData <- npx %>%
     select(PlateID, colnames(meta)) %>%
-    unique()
+    group_by(SampleID) %>%
+    summarise_all(function(x){str_c(unique(x), collapse="_")})
   colData <- data.frame(
     select(colData, -SampleID),
     row.names = colData$SampleID, check.names = FALSE
@@ -116,6 +144,7 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
 #' @param npxFn Path to NPX files
 #' @importFrom OlinkAnalyze read_NPX
 #' @importFrom purrr map_dfr
+#' @importFrom magrittr %>%
 #' @export
 #' @return A \code{character}(n) object.
 #' @author Ge Tan
@@ -128,6 +157,11 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
 #' list_panels(npxFn)
 list_panels <- function(npxFn) {
   npx <- map_dfr(npxFn, read_NPX)
-  panels <- unique(npx$Panel)
+  panels <- unique(npx$Panel) %>% .renamePanels()
   return(panels)
+}
+
+.renamePanels <- function(panels){
+  dplyr::recode(panels,
+                "Olink INFLAMMATION"="Olink Target 96 Inflammation")
 }
