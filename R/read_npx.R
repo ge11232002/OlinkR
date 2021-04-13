@@ -15,7 +15,7 @@
 #' @importFrom readxl read_excel
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom reshape2 acast
-#' @importFrom dplyr select right_join group_by summarise ungroup bind_rows mutate if_else rename_with across
+#' @importFrom dplyr select right_join group_by summarise ungroup bind_rows mutate if_else rename_with across summarise_all
 #' @importFrom tidyselect contains all_of
 #' @importFrom stringr str_c
 #' @importFrom magrittr %>%
@@ -107,10 +107,10 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
   ## Build SummarizedExperiment object ------------------------------
   npxMat <- npx %>%
     select(SampleID, OlinkID, NPX) %>%
-    acast(OlinkID ~ SampleID, value.var = "NPX")
+    acast(OlinkID ~ SampleID, mean, value.var = "NPX")
   lodMat <- npx %>%
     select(SampleID, OlinkID, LOD) %>%
-    acast(OlinkID ~ SampleID, value.var = "LOD")
+    acast(OlinkID ~ SampleID, mean, value.var = "LOD")
   colData <- npx %>%
     select(PlateID, colnames(meta)) %>%
     group_by(SampleID) %>%
