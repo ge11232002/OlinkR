@@ -34,4 +34,6 @@ Imports:
   ggplot2,
   rlang,
   purrr,
-  readr
+  readr,
+  ggsci,
+  tidyr
