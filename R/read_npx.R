@@ -55,6 +55,7 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
     }
     npx <- olink_normalization(df1 = npxList[[1]], df2 = npxList[[2]],
                                overlapping_samples_df1 = repeatedSamples)
+    npx <- npx[!select(npx, SampleID, OlinkID) %>% duplicated(), ]
   }else{
     # npx <- map_dfr(npxFn, read_NPX)
     npx <- bind_rows(npxList)
