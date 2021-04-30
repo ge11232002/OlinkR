@@ -35,30 +35,33 @@
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' read_npx(npxFn, metaFn)
 read_npx <- function(npxFn, metaFn, panel = NULL) {
-  npxList <- map(npxFn, read_NPX)
-  ## Sometimes, the NPX files can have different columns from different versions of NPX managers
-  overlapCols <- map(npxList, colnames) %>% reduce(intersect)
-  npxList <- map(npxList, select, all_of(overlapCols))
-
-  repeatedSamples <- map(npxList, function(x){unique(x$SampleID)}) %>%
-    reduce(intersect)
-
-  if(length(repeatedSamples) > 0){
-    message("Doing reference samples normalisation.")
-    if(length(npxList) != 2){
-      stop("The reference samples normalisation can only handle two assays.")
-      # TODO: if needed, it's possible to extend to more assays.
-      #       It's important to choose a reference for all.
-    }
-    if(length(repeatedSamples) < 8){
-      warning("The minimal number of bridging samples for normalisation is 8, you have ", length(repeatedSamples))
-    }
-    npx <- olink_normalization(df1 = npxList[[1]], df2 = npxList[[2]],
-                               overlapping_samples_df1 = repeatedSamples)
-    npx <- npx[!select(npx, SampleID, OlinkID) %>% duplicated(), ]
+  if(length(npxFn) == 1){
+    npx <- read_NPX(npxFn)
   }else{
-    # npx <- map_dfr(npxFn, read_NPX)
-    npx <- bind_rows(npxList)
+    # Two cases: 1. different samples from multiple plates
+    # 2. some bridging samples from two plates.
+    npxList <- map(npxFn, read_NPX)
+    ## Sometimes, the NPX files can have different columns from different versions of NPX managers
+    overlapCols <- map(npxList, colnames) %>% reduce(intersect)
+    npxList <- map(npxList, select, all_of(overlapCols))
+
+    repeatedSamples <- map(npxList, function(x){unique(x$SampleID)}) %>%
+      reduce(intersect)
+
+    if(length(repeatedSamples) > 0){
+      message("Doing reference samples normalisation.")
+      if(length(npxList) != 2){
+        stop("The reference samples normalisation can only handle two assays.")
+        # TODO: if needed, it's possible to extend to more assays.
+        #       It's important to choose a reference for all.
+      }
+      if(length(repeatedSamples) < 8){
+        warning("The minimal number of bridging samples for normalisation is 8, you have ", length(repeatedSamples))
+      }
+      npx <- olink_normalization(df1 = npxList[[1]], df2 = npxList[[2]],
+                                 overlapping_samples_df1 = repeatedSamples)
+      npx <- npx[!select(npx, SampleID, OlinkID) %>% duplicated(), ]
+      }
   }
 
   npx <- npx %>% mutate(Panel = .renamePanels(Panel))
