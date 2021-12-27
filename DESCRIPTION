@@ -1,6 +1,6 @@
 Package: OlinkR
 Title: A toolkit for Olink data analysis
-Version: 0.0.0.9001
+Version: 1.0.0
 Authors@R: 
     person(given = "Ge",
            family = "Tan",
@@ -12,8 +12,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
-Depends: R (>= 4.0)
+RoxygenNote: 7.1.2
 Imports: 
   OlinkAnalyze (>= 1.0.2),
   PCAtools,
