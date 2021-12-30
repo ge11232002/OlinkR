@@ -8,53 +8,52 @@
 #' @param dir The output folder. The default is current working directory.
 #' @importFrom readr write_lines write_tsv
 #' @importFrom dplyr filter pull select
+#' @importFrom rlang .data
+#' @importFrom fs dir_create path
 #' @export
 #' @return An invisible character object with exported file names.
 #' @author Ge Tan
 #' @examples
-#' npxFn <- system.file("extdata", c(
-#'   "20200507_Inflammation_NPX_1.xlsx",
-#'   "20200625_Inflammation_NPX_2.xlsx"
-#' ),
-#' package = "OlinkR"
-#' )
+#' npxFn <- system.file("extdata",
+#'                       c("20200507_Inflammation_NPX_1.xlsx",
+#'                         "20200625_Inflammation_NPX_2.xlsx"),
+#'                      package = "OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' se <- read_npx(npxFn, metaFn)$SummarizedExperiment
-#' tb <- olink_limma(se,
-#'   factorCol = "condition_Factor",
-#'   contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
-#'   blocking = "Donor_Factor"
-#' )
+#' tb <- olink_limma(se, factorCol = "condition_Factor",
+#'                   contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
+#'                   blocking = "Donor_Factor")
 #' files <- webgestalt_prep(tb)
 #' file.remove(files)
 webgestalt_prep <- function(x, pvalue = 0.01, log2FC = 0, dir = ".") {
-  dir.create(dir, recursive = TRUE)
+  dir_create(dir)
 
   # ORA files ---------------------------------------------------------------
   tb_ora <- x %>%
-    filter(logFC > log2FC, P.Value <= pvalue) %>%
-    pull(UniProt)
-  write_lines(tb_ora, file = file.path(dir, "webgestalt_upregulated_ora.txt"))
+    filter(.data$logFC > log2FC, .data$P.Value <= pvalue) %>%
+    pull(.data$UniProt)
+  write_lines(tb_ora, file = path(dir, "webgestalt_upregulated_ora.txt"))
 
   tb_ora <- x %>%
-    filter(logFC < -log2FC, P.Value <= pvalue) %>%
-    pull(UniProt)
-  write_lines(tb_ora, file = file.path(dir, "webgestalt_downregulated_ora.txt"))
+    filter(.data$logFC < -log2FC, .data$P.Value <= pvalue) %>%
+    pull(.data$UniProt)
+  write_lines(tb_ora, file = path(dir, "webgestalt_downregulated_ora.txt"))
 
   # GSEA --------------------------------------------------------------------
-  tb_gsea <- x %>% select(UniProt, logFC)
-  write_tsv(tb_gsea,
-    file = file.path(dir, "webgestalt_gsea.rnk"),
-    col_names = FALSE
-  )
+  tb_gsea <- x %>%
+    select(.data$UniProt, .data$logFC)
+  write_tsv(tb_gsea, file = path(dir, "webgestalt_gsea.rnk"),
+            col_names = FALSE)
 
   # Background --------------------------------------------------------------
-  tb_background <- x %>% pull(UniProt)
-  write_lines(tb_background, file = file.path(dir, "webgestalt_background.txt"))
+  tb_background <- x %>%
+    pull(.data$UniProt)
+  write_lines(tb_background, file = path(dir, "webgestalt_background.txt"))
 
-  invisible(file.path(dir, c(
-    "webgestalt_upregulated_ora.txt",
-    "webgestalt_downregulated_ora.txt",
-    "webgestalt_gsea.rnk", "webgestalt_background.txt"
-  )))
+  invisible(path(dir,
+                 c("webgestalt_upregulated_ora.txt",
+                   "webgestalt_downregulated_ora.txt",
+                   "webgestalt_gsea.rnk", "webgestalt_background.txt")
+                 )
+            )
 }

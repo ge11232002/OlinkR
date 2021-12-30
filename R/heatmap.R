@@ -11,26 +11,25 @@
 #' @importFrom scater uniquifyFeatureNames
 #' @importFrom magrittr %>%
 #' @importFrom grDevices colorRampPalette
+#' @importFrom rlang .data
 #' @export
 #' @return An invisible \code{pheatmap} object.
 #' @author Ge Tan
 #' @examples
-#' npxFn <- system.file("extdata", c(
-#'   "20200507_Inflammation_NPX_1.xlsx",
-#'   "20200625_Inflammation_NPX_2.xlsx"
-#' ),
-#' package = "OlinkR"
-#' )
+#' npxFn <- system.file("extdata",
+#'                      c("20200507_Inflammation_NPX_1.xlsx",
+#'                        "20200625_Inflammation_NPX_2.xlsx"),
+#'                      package = "OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' se <- read_npx(npxFn, metaFn)$SummarizedExperiment
 #' tb <- olink_limma(se,
-#'   factorCol = "condition_Factor",
-#'   contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
-#'   blocking = "Donor_Factor"
-#' )
+#'                   factorCol = "condition_Factor",
+#'                   contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
+#'                   blocking = "Donor_Factor")
 #' olink_heatmap(tb, se)
 olink_heatmap <- function(tb, se, p.value = 0.05, log2FC = 0, ...) {
-  tb <- tb %>% filter(P.Value < p.value, isPresent, abs(logFC) >= log2FC)
+  tb <- tb %>%
+    filter(.data$P.Value < p.value, .data$isPresent, abs(.data$logFC) >= log2FC)
   if (nrow(tb) == 0L) {
     return(NULL)
   }
@@ -45,11 +44,10 @@ olink_heatmap <- function(tb, se, p.value = 0.05, log2FC = 0, ...) {
   annotation_col <- Filter(function(y) !all(is.na(y)), annotation_col)
 
   p <- pheatmap(toPlot,
-    color = colorRampPalette(c("blue", "white", "red"))(100),
-    scale = "row", annotation_col = annotation_col,
-    cluster_rows = if_else(nrow(toPlot) >= 2, TRUE, FALSE),
-    cluster_cols = FALSE, ...
-  )
+                color = colorRampPalette(c("blue", "white", "red"))(100),
+                scale = "row", annotation_col = annotation_col,
+                cluster_rows = if_else(nrow(toPlot) >= 2, TRUE, FALSE),
+                cluster_cols = FALSE, ...)
   invisible(p)
 }
 
@@ -72,12 +70,10 @@ olink_heatmap <- function(tb, se, p.value = 0.05, log2FC = 0, ...) {
 #' @return A \code{pheatmap} object.
 #' @author Ge Tan
 #' @examples
-#' npxFn <- system.file("extdata", c(
-#'   "20200507_Inflammation_NPX_1.xlsx",
-#'   "20200625_Inflammation_NPX_2.xlsx"
-#' ),
-#' package = "OlinkR"
-#' )
+#' npxFn <- system.file("extdata",
+#'                      c("20200507_Inflammation_NPX_1.xlsx",
+#'                        "20200625_Inflammation_NPX_2.xlsx"),
+#'                      package = "OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' se <- read_npx(npxFn, metaFn)$SummarizedExperiment
 #' overview_heatmap(se)
@@ -91,27 +87,21 @@ overview_heatmap <- function(se, scale = c("none", "row", "column"),
   annotation_col <- data.frame(colData(se), check.names = FALSE)
 
   if (scale == "none") {
-    p <- pheatmap(toPlot,
-      scale = scale, annotation_col = annotation_col,
-      cluster_rows = cluster_features, cluster_cols = cluster_samples,
-      ...
-    )
+    p <- pheatmap(toPlot, scale = scale, annotation_col = annotation_col,
+                  cluster_rows = cluster_features, cluster_cols = cluster_samples,
+                  ...)
   } else {
     if (scale == "row") {
       toPlot <- toPlot[!near(rowSds(toPlot), 0), , drop = FALSE]
-      p <- pheatmap(toPlot,
-        color = colorRampPalette(c("blue", "white", "red"))(100),
-        scale = scale, annotation_col = annotation_col,
-        cluster_rows = cluster_features, cluster_cols = cluster_samples,
-        ...
-      )
+      p <- pheatmap(toPlot, color = colorRampPalette(c("blue", "white", "red"))(100),
+                    scale = scale, annotation_col = annotation_col,
+                    cluster_rows = cluster_features, cluster_cols = cluster_samples,
+                    ...)
     } else if (scale == "column") {
-      p <- pheatmap(toPlot,
-        color = colorRampPalette(c("blue", "white", "red"))(100),
-        scale = scale, annotation_col = annotation_col,
-        cluster_rows = cluster_features, cluster_cols = cluster_samples,
-        ...
-      )
+      p <- pheatmap(toPlot, color = colorRampPalette(c("blue", "white", "red"))(100),
+                    scale = scale, annotation_col = annotation_col,
+                    cluster_rows = cluster_features, cluster_cols = cluster_samples,
+                    ...)
     }
   }
   return(p)

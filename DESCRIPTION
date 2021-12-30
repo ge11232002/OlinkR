@@ -8,7 +8,7 @@ Authors@R:
            email = "ge_tan@live.com",
            comment = c(ORCID = "https://orcid.org/0000-0003-0026-8739"))
 Description: OlinkR provides tools to analyse Olink data.
-License: MIT + file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
@@ -35,4 +35,5 @@ Imports:
   purrr,
   readr,
   ggsci,
-  tidyr
+  tidyr,
+  fs

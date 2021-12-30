@@ -16,29 +16,29 @@
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom reshape2 acast
 #' @importFrom dplyr select right_join group_by summarise ungroup bind_rows mutate if_else rename_with across summarise_all
-#' @importFrom tidyselect contains all_of
+#' @importFrom tidyselect contains all_of ends_with
 #' @importFrom stringr str_c
 #' @importFrom magrittr %>%
 #' @importFrom stats median model.matrix
 #' @importFrom purrr map reduce
+#' @importFrom rlang .data
 #' @export
 #' @return A list with two objects: a \code{\link[tibble]{tibble}} in long format and a
 #'         \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
 #' @author Ge Tan
 #' @examples
-#' npxFn <- system.file("extdata", c(
-#'   "20200507_Inflammation_NPX_1.xlsx",
-#'   "20200625_Inflammation_NPX_2.xlsx"
-#' ),
-#' package = "OlinkR"
-#' )
+#' npxFn <- system.file("extdata",
+#'                      c("20200507_Inflammation_NPX_1.xlsx",
+#'                        "20200625_Inflammation_NPX_2.xlsx"),
+#'                      package = "OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' read_npx(npxFn, metaFn)
 read_npx <- function(npxFn, metaFn, panel = NULL) {
   if(length(npxFn) == 1){
     npx <- read_NPX(npxFn)
   }else{
-    # Two cases: 1. different samples from multiple plates
+    # Two cases:
+    # 1. different samples from multiple plates
     # 2. some bridging samples from two plates.
     npxList <- map(npxFn, read_NPX)
     ## Sometimes, the NPX files can have different columns from different versions of NPX managers
@@ -51,20 +51,25 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
     if(length(repeatedSamples) > 0){
       message("Doing reference samples normalisation.")
       if(length(npxList) != 2){
-        stop("The reference samples normalisation can only handle two assays.")
+        stop("The reference samples normalisation can only handle two plates.")
         # TODO: if needed, it's possible to extend to more assays.
         #       It's important to choose a reference for all.
       }
       if(length(repeatedSamples) < 8){
         warning("The minimal number of bridging samples for normalisation is 8, you have ", length(repeatedSamples))
       }
-      npx <- olink_normalization(df1 = npxList[[1]], df2 = npxList[[2]],
+      npx <- olink_normalization(df1 = npxList[[1]],
+                                 df2 = npxList[[2]],
                                  overlapping_samples_df1 = repeatedSamples)
-      npx <- npx[!select(npx, SampleID, OlinkID) %>% duplicated(), ]
-      }
+      npx <- npx[!select(npx, .data$SampleID, .data$OlinkID) %>% duplicated(), ]
+    }else{
+      message("No enough reference samples. Simply join plates.")
+      npx <- bind_rows(npxList)
+    }
   }
 
-  npx <- npx %>% mutate(Panel = .renamePanels(Panel))
+  npx <- npx %>%
+    mutate(Panel = .renamePanels(.data$Panel))
 
   if (is.null(panel)) {
     panel <- unique(npx$Panel) %>% head(1)
@@ -78,18 +83,18 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
   message("Loading the data from panel: ", panel)
 
   npx <- npx %>%
-    filter(Panel == panel) %>%
+    filter(.data$Panel == panel) %>%
     mutate(
-      NPX = if_else(is.na(NPX), LOD, NPX), isLOD = NPX <= LOD,
-      MissingFreq = as.numeric(MissingFreq)
+      NPX = if_else(is.na(.data$NPX), .data$LOD, .data$NPX),
+      isLOD = .data$NPX <= .data$LOD,
+      MissingFreq = as.numeric(.data$MissingFreq)
     )
   meta <- read_excel(metaFn)
   meta <- rename_with(meta, make.names)
-  meta <- meta %>% select(
-    "SampleID", ends_with("_Factor"), ends_with("_Numeric")
-  ) %>%
+  meta <- meta %>%
+    select(.data$SampleID, ends_with("_Factor"), ends_with("_Numeric")) %>%
     mutate(across(ends_with("_Factor"),
-                  function(x){res=make.names(x);res[is.na(x)]=NA;res}))
+                  function(x){res = make.names(x); res[is.na(x)]=NA; res}))
 
   if (length(setdiff(npx$SampleID, meta$SampleID)) != 0L) {
     warning(
@@ -106,30 +111,32 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
     )
   }
 
-  npx <- npx %>% right_join(meta)
+  npx <- npx %>%
+    right_join(meta)
 
   ## Build SummarizedExperiment object ------------------------------
   npxMat <- npx %>%
-    select(SampleID, OlinkID, NPX) %>%
+    select(.data$SampleID, .data$OlinkID, .data$NPX) %>%
     acast(OlinkID ~ SampleID, mean, value.var = "NPX")
   lodMat <- npx %>%
-    select(SampleID, OlinkID, LOD) %>%
+    select(.data$SampleID, .data$OlinkID, .data$LOD) %>%
     acast(OlinkID ~ SampleID, mean, value.var = "LOD")
   colData <- npx %>%
-    select(PlateID, colnames(meta)) %>%
-    group_by(SampleID) %>%
+    select(.data$PlateID, colnames(meta)) %>%
+    group_by(.data$SampleID) %>%
     summarise_all(function(x){str_c(unique(x), collapse="_")})
   colData <- data.frame(
-    select(colData, -SampleID),
+    select(colData, -.data$SampleID),
     row.names = colData$SampleID, check.names = FALSE
   )
   rowData <- npx %>%
-    select(OlinkID, UniProt, Assay, Panel, MissingFreq) %>%
-    group_by(OlinkID, UniProt, Assay, Panel) %>%
-    summarise(MissingFreq = median(MissingFreq)) %>%
+    select(.data$OlinkID, .data$UniProt, .data$Assay,
+           .data$Panel, .data$MissingFreq) %>%
+    group_by(.data$OlinkID, .data$UniProt, .data$Assay, .data$Panel) %>%
+    summarise(MissingFreq = median(.data$MissingFreq)) %>%
     ungroup()
   rowData <- data.frame(
-    select(rowData, -OlinkID),
+    select(rowData, -.data$OlinkID),
     row.names = rowData$OlinkID, check.names = FALSE
   )
 

@@ -12,30 +12,30 @@
 #' @importFrom ggplot2 ggplot aes_string geom_boxplot geom_jitter theme ggtitle element_blank element_text
 #' @importFrom ggsci scale_fill_npg
 #' @importFrom cowplot theme_cowplot
+#' @importFrom rlang .data
 #' @export
 #' @return A list of \code{ggplot} objects
 #' @author Ge Tan
 #' @examples
-#' npxFn <- system.file("extdata", c(
-#'   "20200507_Inflammation_NPX_1.xlsx",
-#'   "20200625_Inflammation_NPX_2.xlsx"
-#' ),
-#' package = "OlinkR"
-#' )
+#' npxFn <- system.file("extdata",
+#'                      c("20200507_Inflammation_NPX_1.xlsx",
+#'                        "20200625_Inflammation_NPX_2.xlsx"),
+#'                      package = "OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
 #' se <- read_npx(npxFn, metaFn)$SummarizedExperiment
 #' features <- c("IL8", "MCP-3")
 #' pList <- olink_boxplot(se, features, x = "condition_Factor")
 olink_boxplot <- function(se, features, x = NULL){
   toPlot <- as_tibble(assay(se, "npx"), rownames = "OlinkID") %>%
-    pivot_longer(cols=-OlinkID, names_to = "SampleID", values_to = "NPX") %>%
+    pivot_longer(cols = -.data$OlinkID, names_to = "SampleID",
+                 values_to = "NPX") %>%
     left_join(as_tibble(colData(se), rownames = "SampleID")) %>%
     left_join(as_tibble(rowData(se), rownames = "OlinkID")) %>%
-    filter(Assay %in% features)
+    filter(.data$Assay %in% features)
   pList <- list()
   feature <- features[1]
   for(feature in features){
-    toPlot_one <- filter(toPlot, Assay == feature)
+    toPlot_one <- filter(toPlot, .data$Assay == feature)
     olinkID <- toPlot_one$OlinkID[1]
     p <- ggplot(toPlot_one, aes_string(x, "NPX", fill = x)) +
       geom_boxplot(outlier.shape = NA) +

@@ -13,6 +13,7 @@
 #' @importFrom dplyr mutate case_when filter arrange pull
 #' @importFrom magrittr %>%
 #' @importFrom ggplot2 ggplot aes geom_point scale_color_manual scale_x_continuous geom_hline geom_vline xlab ylab
+#' @importFrom rlang .data
 #' @export
 #' @return A \code{ggplot} object.
 #' @author Ge Tan
@@ -32,28 +33,29 @@
 #' )
 #' olink_volcano(tb)
 olink_volcano <- function(tb, p.value = 0.05, log2FC = 0, olinkIds = NULL) {
-  tb <- tb %>% mutate(type = case_when(
-    P.Value <= p.value & abs(logFC) >= log2FC & isPresent ~ "Significant",
-    (P.Value > p.value | abs(logFC) < log2FC) & isPresent ~ "Non-significant",
-    TRUE ~ "Absent"
-  ))
+  tb <- tb %>%
+    mutate(type = case_when(
+      .data$P.Value <= p.value & abs(.data$logFC) >= log2FC & .data$isPresent ~ "Significant",
+      (.data$P.Value > p.value | abs(.data$logFC) < log2FC) & .data$isPresent ~ "Non-significant",
+      TRUE ~ "Absent")
+      )
   if (is.null(olinkIds)) {
     olinkIds <- tb %>%
-      filter(type == "Significant") %>%
-      pull(OlinkID)
+      filter(.data$type == "Significant") %>%
+      pull(.data$OlinkID)
   }
 
-  p <- ggplot(tb %>% arrange(type), aes(logFC, -log10(P.Value))) +
-    geom_point(aes(col = type)) +
+  p <- ggplot(tb %>% arrange(.data$type),
+              aes(.data$logFC, -log10(.data$P.Value))) +
+    geom_point(aes(col = .data$type)) +
     geom_label_repel(
-      data = filter(tb, OlinkID %in% olinkIds),
-      aes(label = Assay), box.padding = 1,
-      segment.color = "grey50", max.overlaps = 40
-    ) +
+      data = filter(tb, .data$OlinkID %in% olinkIds),
+      aes(label = .data$Assay),
+      box.padding = 1,
+      segment.color = "grey50", max.overlaps = 40) +
     scale_color_manual(values = c(
       "Significant" = "red", "Non-significant" = "black",
-      "Absent" = "gray"
-    )) +
+      "Absent" = "gray")) +
     geom_hline(yintercept = -log10(p.value), linetype = "dotted") +
     geom_vline(xintercept = log2FC, linetype = "dotted") +
     geom_vline(xintercept = -log2FC, linetype = "dotted") +
