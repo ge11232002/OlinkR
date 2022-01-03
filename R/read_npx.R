@@ -13,9 +13,7 @@
 #'              By default, the first panel in the data will be loaded.
 #' @importFrom OlinkAnalyze read_NPX olink_normalization
 #' @importFrom readxl read_excel
-#' @importFrom SummarizedExperiment SummarizedExperiment
-#' @importFrom reshape2 acast
-#' @importFrom dplyr select right_join group_by summarise ungroup bind_rows mutate if_else rename_with across summarise_all
+#' @importFrom dplyr select right_join bind_rows mutate if_else rename_with across
 #' @importFrom tidyselect contains all_of ends_with
 #' @importFrom stringr str_c
 #' @importFrom magrittr %>%
@@ -23,8 +21,21 @@
 #' @importFrom purrr map reduce
 #' @importFrom rlang .data
 #' @export
-#' @return A list with two objects: a \code{\link[tibble]{tibble}} in long format and a
-#'         \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
+#' @return A \code{\link[tibble]{tibble}} in long format with following columns:
+#' \describe{
+#'   \item{SampleID}{The sample name}
+#'   \item{OlinkID}{The internal Olink IDs}
+#'   \item{UniProt}{The UniProt IDs}
+#'   \item{Assay}{The protein name}
+#'   \item{MissingFreq}{The percentage of samples that have intensities lower than LOD}
+#'   \item{Panel}{The panel name}
+#'   \item{Panel_Version}{The panel version}
+#'   \item{PlateID}{The unique plate ID}
+#'   \item{QC_Warning}{If the splot passes QC}
+#'   \item{LOD}{The limit of detection}
+#'   \item{NPX}{NPX value}
+#'   \item{Normalization}{The intr-plate normalization method}
+#' }
 #' @author Ge Tan
 #' @examples
 #' npxFn <- system.file("extdata",
@@ -32,7 +43,13 @@
 #'                        "20200625_Inflammation_NPX_2.xlsx"),
 #'                      package = "OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
-#' read_npx(npxFn, metaFn)
+#' npx <- read_npx(npxFn, metaFn)
+#'
+#' npxFn <- system.file("extdata", "OlinkAnalyze_extdata", "npx_data2.xlsx",
+#'                      package = "OlinkR")
+#' metaFn <- system.file("extdata", "OlinkAnalyze_extdata" ,
+#'                       "npx_data2_meta.xlsx", package = "OlinkR")
+#' npx <- read_npx(npxFn, metaFn)
 read_npx <- function(npxFn, metaFn, panel = NULL) {
   if(length(npxFn) == 1){
     npx <- read_NPX(npxFn)
@@ -42,7 +59,8 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
     # 2. some bridging samples from two plates.
     npxList <- map(npxFn, read_NPX)
     ## Sometimes, the NPX files can have different columns from different versions of NPX managers
-    overlapCols <- map(npxList, colnames) %>% reduce(intersect)
+    overlapCols <- map(npxList, colnames) %>%
+      reduce(intersect)
     npxList <- map(npxList, select, all_of(overlapCols))
 
     repeatedSamples <- map(npxList, function(x){unique(x$SampleID)}) %>%
@@ -72,7 +90,8 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
     mutate(Panel = .renamePanels(.data$Panel))
 
   if (is.null(panel)) {
-    panel <- unique(npx$Panel) %>% head(1)
+    panel <- unique(npx$Panel) %>%
+      head(1)
   }
   if (length(panel) != 1) {
     stop("This function only reads one panel each time.")
@@ -94,7 +113,7 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
   meta <- meta %>%
     select(.data$SampleID, ends_with("_Factor"), ends_with("_Numeric")) %>%
     mutate(across(ends_with("_Factor"),
-                  function(x){res = make.names(x); res[is.na(x)]=NA; res}))
+                  function(x){res = make.names(x); res[is.na(x)] = NA; res}))
 
   if (length(setdiff(npx$SampleID, meta$SampleID)) != 0L) {
     warning(
@@ -114,7 +133,29 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
   npx <- npx %>%
     right_join(meta)
 
-  ## Build SummarizedExperiment object ------------------------------
+  return(npx)
+}
+
+#' Coercion to \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
+#'
+#' Coercion to \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
+#' @param npx \code{\link[tibble]{tibble}} object from \code{\link{read_npx}}.
+#' @importFrom magrittr %>%
+#' @importFrom dplyr select group_by summarise ungroup distinct
+#' @importFrom reshape2 acast
+#' @importFrom stringr str_c
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @export
+#' @return A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
+#' @author Ge Tan
+#' @examples
+#' npxFn <- system.file("extdata", "OlinkAnalyze_extdata", "npx_data2.xlsx",
+#'                      package = "OlinkR")
+#' metaFn <- system.file("extdata", "OlinkAnalyze_extdata",
+#'                       "npx_data2_meta.xlsx", package = "OlinkR")
+#' npx <- read_npx(npxFn, metaFn)
+#' se <- as_se(npx)
+as_se <- function(npx){
   npxMat <- npx %>%
     select(.data$SampleID, .data$OlinkID, .data$NPX) %>%
     acast(OlinkID ~ SampleID, mean, value.var = "NPX")
@@ -122,30 +163,31 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
     select(.data$SampleID, .data$OlinkID, .data$LOD) %>%
     acast(OlinkID ~ SampleID, mean, value.var = "LOD")
   colData <- npx %>%
-    select(.data$PlateID, colnames(meta)) %>%
+    select(.data$SampleID, .data$PlateID,
+           ends_with("_Factor"), ends_with("_Numeric")
+           ) %>%
     group_by(.data$SampleID) %>%
-    summarise_all(function(x){str_c(unique(x), collapse="_")})
-  colData <- data.frame(
-    select(colData, -.data$SampleID),
-    row.names = colData$SampleID, check.names = FALSE
-  )
+    summarise(across(.cols = c("PlateID", ends_with("_Factor")),
+                     function(x){str_c(unique(x), collapse = "_")}),
+              across(ends_with("_Numeric"), mean, na.rm = TRUE))
+  colData <- data.frame(select(colData, -.data$SampleID),
+                        row.names = colData$SampleID, check.names = FALSE)
   rowData <- npx %>%
     select(.data$OlinkID, .data$UniProt, .data$Assay,
            .data$Panel, .data$MissingFreq) %>%
     group_by(.data$OlinkID, .data$UniProt, .data$Assay, .data$Panel) %>%
     summarise(MissingFreq = median(.data$MissingFreq)) %>%
     ungroup()
-  rowData <- data.frame(
-    select(rowData, -.data$OlinkID),
-    row.names = rowData$OlinkID, check.names = FALSE
-  )
+  rowData <- data.frame(select(rowData, -.data$OlinkID),
+                        row.names = rowData$OlinkID, check.names = FALSE)
 
   se <- SummarizedExperiment(
     assays = list(npx = npxMat, npxQCFlag = npxMat > lodMat),
     colData = colData[colnames(npxMat), ],
     rowData = rowData[rownames(npxMat), ]
   )
-  return(list(tibble = npx, SummarizedExperiment = se))
+
+  return(se)
 }
 
 #' List panels from NPX files
@@ -168,11 +210,18 @@ read_npx <- function(npxFn, metaFn, panel = NULL) {
 #' list_panels(npxFn)
 list_panels <- function(npxFn) {
   npx <- map_dfr(npxFn, read_NPX)
-  panels <- unique(npx$Panel) %>% .renamePanels()
+  panels <- unique(npx$Panel) %>%
+    .renamePanels()
   return(panels)
 }
 
+#' Rename panel name
+#'
+#' Rename panel name to be consistent between different years/batches.
+#' @param panels \code{character}(n): the panel names
+#' @importFrom dplyr recode
+#' @author Ge Tan
 .renamePanels <- function(panels){
-  dplyr::recode(panels,
-                "Olink INFLAMMATION"="Olink Target 96 Inflammation")
+  recode(panels,
+         "Olink INFLAMMATION" = "Olink Target 96 Inflammation")
 }

@@ -15,8 +15,21 @@ read_npx(npxFn, metaFn, panel = NULL)
 By default, the first panel in the data will be loaded.}
 }
 \value{
-A list with two objects: a \code{\link[tibble]{tibble}} in long format and a
-\code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
+A \code{\link[tibble]{tibble}} in long format with following columns:
+\describe{
+\item{SampleID}{The sample name}
+\item{OlinkID}{The internal Olink IDs}
+\item{UniProt}{The UniProt IDs}
+\item{Assay}{The protein name}
+\item{MissingFreq}{The percentage of samples that have intensities lower than LOD}
+\item{Panel}{The panel name}
+\item{Panel_Version}{The panel version}
+\item{PlateID}{The unique plate ID}
+\item{QC_Warning}{If the splot passes QC}
+\item{LOD}{The limit of detection}
+\item{NPX}{NPX value}
+\item{Normalization}{The intr-plate normalization method}
+}
 }
 \description{
 Read one or more NPX files from Olink NPX manager and
@@ -34,7 +47,13 @@ npxFn <- system.file("extdata",
                        "20200625_Inflammation_NPX_2.xlsx"),
                      package = "OlinkR")
 metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
-read_npx(npxFn, metaFn)
+npx <- read_npx(npxFn, metaFn)
+
+npxFn <- system.file("extdata", "OlinkAnalyze_extdata", "npx_data2.xlsx",
+                     package = "OlinkR")
+metaFn <- system.file("extdata", "OlinkAnalyze_extdata" ,
+                      "npx_data2_meta.xlsx", package = "OlinkR")
+npx <- read_npx(npxFn, metaFn)
 }
 \author{
 Ge Tan
