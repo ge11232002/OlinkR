@@ -7,19 +7,20 @@
 olink_limma(se, factorCol, contrasts, blocking = NULL)
 }
 \arguments{
-\item{se}{A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.}
+\item{se}{a \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.}
 
-\item{factorCol}{\code{character}(1): The metadata column in \code{se} that defines the grouping.}
+\item{factorCol}{\code{character}(1): the metadata column in \code{se} that defines the grouping.}
 
-\item{contrasts}{\code{character}(1): A character string which can be parsed to expressions, specifying contrasts.}
+\item{contrasts}{\code{character}(1): a character string which can be parsed to expressions, specifying contrasts.}
 
-\item{blocking}{\code{character}(1): The metadata column in \code{se} which serves as a blocking factor.}
+\item{blocking}{\code{character}(1): the metadata column in \code{se} which serves as a blocking factor.}
 }
 \value{
 A \code{tibble} object of results from limma analysis
 }
 \description{
-Given a \code{SummarizedExperiment} object, perform two groups comparison with \code{limma} package.
+Given a \code{\link[SummarizedExperiment]{SummarizedExperiment}} object,
+perform two groups comparison with \code{limma} package.
 }
 \examples{
 npxFn <- system.file("extdata", c(

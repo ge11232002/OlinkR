@@ -1,11 +1,12 @@
 #' limma analysis for Olink data
 #'
-#' Given a \code{SummarizedExperiment} object, perform two groups comparison with \code{limma} package.
+#' Given a \code{\link[SummarizedExperiment]{SummarizedExperiment}} object,
+#' perform two groups comparison with \code{limma} package.
 #'
-#' @param se A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
-#' @param factorCol \code{character}(1): The metadata column in \code{se} that defines the grouping.
-#' @param contrasts \code{character}(1): A character string which can be parsed to expressions, specifying contrasts.
-#' @param blocking \code{character}(1): The metadata column in \code{se} which serves as a blocking factor.
+#' @param se a \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.
+#' @param factorCol \code{character}(1): the metadata column in \code{se} that defines the grouping.
+#' @param contrasts \code{character}(1): a character string which can be parsed to expressions, specifying contrasts.
+#' @param blocking \code{character}(1): the metadata column in \code{se} which serves as a blocking factor.
 #' @importMethodsFrom SummarizedExperiment assay rowData colData
 #' @importFrom limma makeContrasts lmFit contrasts.fit topTable eBayes
 #' @importFrom stringr str_split str_trim str_replace

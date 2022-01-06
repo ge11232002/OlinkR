@@ -16,11 +16,8 @@ A \code{character}(n) object.
 Read through the given NPX files and return all panels inside
 }
 \examples{
-npxFn <- system.file("extdata", c(
-  "2019-01-02_20181145_Akdis_Nasal_NPX_LOD.xlsx"
-),
-package = "OlinkR"
-)
+npxFn <- system.file("extdata", "OlinkAnalyze_extdata", "npx_data2.xlsx",
+                     package = "OlinkR")
 list_panels(npxFn)
 }
 \author{

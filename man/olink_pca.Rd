@@ -7,36 +7,39 @@
 olink_pca(se, colby = NULL, shape = NULL, metavars = NULL, removeVar = 0.1)
 }
 \arguments{
-\item{se}{An \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.}
+\item{se}{a \code{\link[SummarizedExperiment]{SummarizedExperiment}} object.}
 
-\item{colby}{\code{character}(1): The metadata column in \code{se} to use for colour.}
+\item{colby}{\code{character}(1): the metadata column in \code{se} to use for colour.}
 
-\item{shape}{\code{character}(1): The metadata column in \code{se} to use for shape.}
+\item{shape}{\code{character}(1): the metadata column in \code{se} to use for shape.}
 
-\item{metavars}{\code{character}(n): The metedata columns with numeric values in \code{se} to correlate with principal components.}
+\item{metavars}{\code{character}(n): the metedata columns with numeric values in \code{se} to correlate with principal components.}
 
-\item{removeVar}{\code{numeric}(1): Remove this fraction of variables based on low variance. DEFAULT = 0.1. OPTIONAL.}
+\item{removeVar}{\code{numeric}(1): remove this fraction of variables based on low variance. DEFAULT = 0.1. OPTIONAL.}
 }
 \value{
 A list of \code{ggplot} and \code{tibble} objects.
 }
 \description{
-Given a \code{SummarizedExperiment} object, perform the PCA analysis implemented
-in Bioconductor package \code{PCAtools}
+Given a \code{\link[SummarizedExperiment]{SummarizedExperiment}} object,
+perform the PCA analysis implemented in Bioconductor package \code{PCAtools}.
 }
 \examples{
-npxFn <- system.file("extdata", c(
-  "20200507_Inflammation_NPX_1.xlsx",
-  "20200625_Inflammation_NPX_2.xlsx"
-),
-package = "OlinkR"
-)
+npxFn <- system.file("extdata",
+                     c("20200507_Inflammation_NPX_1.xlsx",
+                       "20200625_Inflammation_NPX_2.xlsx"),
+                     package = "OlinkR")
 metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
-se <- read_npx(npxFn, metaFn)$SummarizedExperiment
-ans <- olink_pca(se,
-  colby = "condition_Factor", shape = "Donor_Factor",
-  metavars = "Weight_Numeric"
-)
+se <- as_se(read_npx(npxFn, metaFn))
+ans <- olink_pca(se, colby = "condition_Factor", shape = "Donor_Factor",
+                 metavars = "Weight_Numeric")
+
+npxFn <- system.file("extdata", "OlinkAnalyze_extdata", "npx_data2.xlsx",
+                     package = "OlinkR")
+metaFn <- system.file("extdata", "OlinkAnalyze_extdata",
+                      "npx_data2_meta.xlsx", package = "OlinkR")
+se <- as_se(read_npx(npxFn, metaFn))
+ans <- olink_pca(se, colby = "Treatment_Factor", shape = "Time_Factor")
 }
 \author{
 Ge Tan

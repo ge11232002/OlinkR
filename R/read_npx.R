@@ -202,11 +202,8 @@ as_se <- function(npx){
 #' @return A \code{character}(n) object.
 #' @author Ge Tan
 #' @examples
-#' npxFn <- system.file("extdata", c(
-#'   "2019-01-02_20181145_Akdis_Nasal_NPX_LOD.xlsx"
-#' ),
-#' package = "OlinkR"
-#' )
+#' npxFn <- system.file("extdata", "OlinkAnalyze_extdata", "npx_data2.xlsx",
+#'                      package = "OlinkR")
 #' list_panels(npxFn)
 list_panels <- function(npxFn) {
   npx <- map_dfr(npxFn, read_NPX)
