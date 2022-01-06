@@ -19,7 +19,7 @@
 #'                         "20200625_Inflammation_NPX_2.xlsx"),
 #'                      package = "OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
-#' se <- read_npx(npxFn, metaFn)$SummarizedExperiment
+#' se <- as_se(read_npx(npxFn, metaFn))
 #' tb <- olink_limma(se, factorCol = "condition_Factor",
 #'                   contrasts = "Glucose.10mM.Vehicle - Vehicle.Vehicle",
 #'                   blocking = "Donor_Factor")

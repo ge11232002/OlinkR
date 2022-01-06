@@ -22,7 +22,7 @@
 #'                        "20200625_Inflammation_NPX_2.xlsx"),
 #'                      package = "OlinkR")
 #' metaFn <- system.file("extdata", "Inflammation_Metadata.xlsx", package = "OlinkR")
-#' se <- read_npx(npxFn, metaFn)$SummarizedExperiment
+#' se <- as_se(read_npx(npxFn, metaFn))
 #' features <- c("IL8", "MCP-3")
 #' pList <- olink_boxplot(se, features, x = "condition_Factor")
 olink_boxplot <- function(se, features, x = NULL){
